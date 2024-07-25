@@ -26,7 +26,7 @@
 </head>
 
 <body>
-    <div class="container">
+    <div class="">
         <ul class="nav nav-tabs mb-3">
             <li class="nav-item">
                 <a class="nav-link active" onclick="showTab('packingList')" href="#">Packing List</a>
@@ -69,47 +69,61 @@
             <h2>PNK</h2>
             <form id="pnkForm" class="mb-4">
                 <div class="row">
-                  <div class="col-md-3 mb-3">
-                    <label for="nghiepVu" class="form-label">Nghiệp vụ:</label>
-                    <div id="nghiepVu" class="btn-group d-flex flex-wrap" role="group">
-                      <button type="button" class="btn btn-outline-primary" onclick="updateLocationFields('Nhập kho')">Nhập kho</button>
-                      <button type="button" class="btn btn-outline-primary" onclick="updateLocationFields('Xuất kho')">Xuất kho</button>
-                      <button type="button" class="btn btn-outline-primary" onclick="updateLocationFields('Chuyển kho')">Chuyển kho</button>
-                      <button type="button" class="btn btn-outline-primary" onclick="updateLocationFields('Trả hàng')">Trả hàng</button>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label for="nghiepVu" class="form-label">Loại nghiệp vụ:</label>
+                            <select class="form-select" id="nghiepVu" name="nghiepVu" onchange="updateLocationFields()"
+                                required>
+                                <optgroup label="Nhập kho">
+                                    <option value="nhapMuaHang">Nhập mua hàng</option>
+                                    <option value="nhapTraHang">Nhập trả hàng</option>
+                                    <option value="nhapTam">Nhập tạm</option>
+                                    <option value="nhapChuyenKho">Nhập chuyển kho</option>
+                                </optgroup>
+                                <optgroup label="Xuất kho">
+                                    <option value="xuatBan">Xuất bán</option>
+                                    <option value="xuatTam">Xuất tạm</option>
+                                    <option value="xuatChuyenKho">Xuất chuyển kho</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="soPhieu" class="form-label">Số phiếu:</label>
+                            <input type="text" class="form-control" id="soPhieu" name="soPhieu" required>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="ngayThang" class="form-label">Ngày tháng:</label>
+                            <input type="date" class="form-control" id="ngayThang" name="ngayThang" required>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="tuDau" class="form-label">Từ kho:</label>
+                            <select class="form-select" id="tuDau" name="tuDau" required>
+                                <!-- Options will be populated dynamically -->
+                            </select>
+                        </div>
                     </div>
-                  </div>
-                  <div class="col-md-3 mb-3">
-                    <label for="soPhieu" class="form-label">Số phiếu:</label>
-                    <input type="text" class="form-control" id="soPhieu" name="soPhieu" required>
-                  </div>
-                  <div class="col-md-3 mb-3">
-                    <label for="ngayThang" class="form-label">Ngày tháng:</label>
-                    <input type="date" class="form-control" id="ngayThang" name="ngayThang" required>
-                  </div>
-                  <div class="col-md-3 mb-3">
-                    <label for="tuDau" class="form-label">Từ đâu:</label>
-                    <input type="text" class="form-control" id="tuDau" name="tuDau" required>
-                  </div>
+
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label for="denDau" class="form-label">Đến kho:</label>
+                            <select class="form-select" id="denDau" name="denDau" required>
+                                <!-- Options will be populated dynamically -->
+                            </select>
+                        </div>
+                        <div class="col-md-9 mb-3">
+                            <label for="dienGiai" class="form-label">Diễn giải:</label>
+                            <input type="text" class="form-control" id="dienGiai" name="dienGiai" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="chungTuDiKem" class="form-label">Chứng từ đi kèm:</label>
+                        <select class="form-select" id="chungTuDiKem" name="chungTuDiKem" required></select>
+                    </div>
+                    <div class="col-md-3 mb-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">Thêm mới</button>
+                    </div>
                 </div>
-                
-                <div class="row">
-                  <div class="col-md-3 mb-3">
-                    <label for="denDau" class="form-label">Đến đâu:</label>
-                    <input type="text" class="form-control" id="denDau" name="denDau" required>
-                  </div>
-                  <div class="col-md-3 mb-3">
-                    <label for="dienGiai" class="form-label">Diễn giải:</label>
-                    <input type="text" class="form-control" id="dienGiai" name="dienGiai" required>
-                  </div>
-                  <div class="col-md-3 mb-3">
-                    <label for="chungTuDiKem" class="form-label">Chứng từ đi kèm:</label>
-                    <select class="form-select" id="chungTuDiKem" name="chungTuDiKem" required></select>
-                  </div>
-                  <div class="col-md-3 mb-3 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary w-100">Thêm mới</button>
-                  </div>
-                </div>
-              </form>
+            </form>
 
             <h3>Packing List cho INVOICE đã chọn</h3>
             <table id="selectedPackingListTable" class="table table-bordered" style="width: 100%;">
@@ -126,7 +140,7 @@
                         <th>TÊN NHÀ CUNG CẤP</th>
                         <th>SỐ CONTAINER</th>
                         <th>TÊN GỖ</th>
-                        <th>MÃ KIỆN (dùng cho file nội bộ)</th>
+                        <th>MÃ KIỆN</th>
                         <th>KHỐI LƯỢNG THỰC TẾ</th>
                         <th>SỐ THANH THỰC TẾ</th>
                         <th>CHIỀU DÀI THỰC TẾ</th>
@@ -192,57 +206,66 @@
                 columns: packingListData[0].map(header => ({ title: header }))
             });
         }
-        function updateLocationFields(nghiepVu) {
-            const tuDau = document.getElementById('tuDau');
-            const denDau = document.getElementById('denDau');
+        document.addEventListener('DOMContentLoaded', function () {
+            // Đặt ngày mặc định là ngày hiện tại
+            document.getElementById('ngayThang').valueAsDate = new Date();
 
-            if (nghiepVu === 'Nhập kho') {
-                tuDau.value = 'Kho NCC';
-                denDau.value = 'Kho An Phú';
-            } else if (nghiepVu === 'Xuất kho') {
-                tuDau.value = 'Kho An Phú';
-                denDau.value = 'Kho Khách Hàng';
-            } else if (nghiepVu === 'Chuyển kho') {
-                tuDau.value = '';
-                denDau.value = '';
-            } else if (nghiepVu === 'Trả hàng') {
-                tuDau.value = 'Kho Khách Hàng';
-                denDau.value = 'Kho An Phú';
-            } else {
-                tuDau.value = '';
-                denDau.value = '';
+            // Khởi tạo các trường kho
+            updateLocationFields();
+        });
+
+        function updateLocationFields() {
+            const nghiepVu = document.getElementById('nghiepVu').value;
+            const tuKho = document.getElementById('tuDau');
+            const denKho = document.getElementById('denDau');
+
+            // Xóa các option hiện tại
+            tuKho.innerHTML = '';
+            denKho.innerHTML = '';
+
+            // Thêm các option mới dựa trên loại nghiệp vụ
+            switch (nghiepVu) {
+                case 'nhapMuaHang':
+                    addOption(tuKho, 'Kho NCC', 'khoNCC');
+                    addOption(denKho, 'Kho An Phú', 'khoAnPhu', true);
+                    addOption(denKho, 'Kho Hoàng Lâm', 'khoHoangLam');
+                    break;
+                case 'nhapTraHang':
+                    addOption(tuKho, 'Kho khách hàng', 'khoKhachHang');
+                    addOption(denKho, 'Kho An Phú', 'khoAnPhu', true);
+                    addOption(denKho, 'Kho Hoàng Lâm', 'khoHoangLam');
+                    break;
+                case 'nhapTam':
+                    addOption(tuKho, 'Kho NCC', 'khoNCC');
+                    addOption(denKho, 'Kho An Phú', 'khoAnPhu', true);
+                    addOption(denKho, 'Kho Hoàng Lâm', 'khoHoangLam');
+                    break;
+                case 'nhapChuyenKho':
+                    addOption(tuKho, 'Kho Hoàng Lâm', 'khoHoangLam', true);
+                    addOption(tuKho, 'Kho An Phú', 'khoAnPhu');
+                    addOption(denKho, 'Kho An Phú', 'khoAnPhu', true);
+                    addOption(denKho, 'Kho Hoàng Lâm', 'khoHoangLam');
+                    break;
+                case 'xuatBan':
+                case 'xuatTam':
+                    addOption(tuKho, 'Kho An Phú', 'khoAnPhu', true);
+                    addOption(tuKho, 'Kho Hoàng Lâm', 'khoHoangLam');
+                    addOption(denKho, nghiepVu === 'xuatBan' ? 'Kho khách hàng' : 'Kho NCC',
+                        nghiepVu === 'xuatBan' ? 'khoKhachHang' : 'khoNCC');
+                    break;
+                case 'xuatChuyenKho':
+                    addOption(tuKho, 'Kho An Phú', 'khoAnPhu', true);
+                    addOption(tuKho, 'Kho Hoàng Lâm', 'khoHoangLam');
+                    addOption(denKho, 'Kho Hoàng Lâm', 'khoHoangLam', true);
+                    addOption(denKho, 'Kho An Phú', 'khoAnPhu');
+                    break;
             }
-
-            updateSoPhieu();
         }
 
-        function updateSoPhieu() {
-            const nghiepVuButtons = document.querySelectorAll('#nghiepVu .btn');
-            let nghiepVu = '';
-            nghiepVuButtons.forEach(button => {
-                if (button.classList.contains('active')) {
-                    nghiepVu = button.textContent.trim();
-                }
-            });
-
-            const tuDau = document.getElementById('tuDau').value;
-            const denDau = document.getElementById('denDau').value;
-            const ngayThang = document.getElementById('ngayThang').value.replace(/-/g, '.');
-
-            if (nghiepVu === 'Nhập kho') {
-                document.getElementById('soPhieu').value = `PNK-${tuDau}-${denDau}-${ngayThang}`;
-            } else if (nghiepVu === 'Xuất kho') {
-                document.getElementById('soPhieu').value = `PXK-${tuDau}-${denDau}-${ngayThang}`;
-            } else if (nghiepVu === 'Chuyển kho') {
-                document.getElementById('soPhieu').value = `PCK-${tuDau}-${denDau}-${ngayThang}`;
-            } else if (nghiepVu === 'Trả hàng') {
-                document.getElementById('soPhieu').value = `PTH-${tuDau}-${denDau}-${ngayThang}`;
-            }
+        function addOption(selectElement, text, value, selected = false) {
+            const option = new Option(text, value, selected, selected);
+            selectElement.add(option);
         }
-
-        document.getElementById('tuDau').addEventListener('change', updateSoPhieu);
-        document.getElementById('denDau').addEventListener('change', updateSoPhieu);
-        document.getElementById('ngayThang').addEventListener('change', updateSoPhieu);
         function initializePNKForm() {
             const invoices = [...new Set(packingListData.slice(1).map(row => row[7]))];
             const select = document.getElementById('chungTuDiKem');
