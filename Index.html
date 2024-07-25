@@ -26,7 +26,7 @@
 </head>
 
 <body>
-    <div class="">
+    <div class="container">
         <ul class="nav nav-tabs mb-3">
             <li class="nav-item">
                 <a class="nav-link active" onclick="showTab('packingList')" href="#">Packing List</a>
@@ -68,39 +68,51 @@
         <div id="pnk" class="tab">
             <h2>PNK</h2>
             <form id="pnkForm" class="mb-4">
-                <div class="mb-3">
+                <div class="row">
+                  <div class="col-md-3 mb-3">
                     <label for="nghiepVu" class="form-label">Nghiệp vụ:</label>
-                    <input type="text" class="form-control" id="nghiepVu" name="nghiepVu" required>
-                </div>
-                <div class="mb-3">
+                    <div id="nghiepVu" class="btn-group d-flex flex-wrap" role="group">
+                      <button type="button" class="btn btn-outline-primary" onclick="updateLocationFields('Nhập kho')">Nhập kho</button>
+                      <button type="button" class="btn btn-outline-primary" onclick="updateLocationFields('Xuất kho')">Xuất kho</button>
+                      <button type="button" class="btn btn-outline-primary" onclick="updateLocationFields('Chuyển kho')">Chuyển kho</button>
+                      <button type="button" class="btn btn-outline-primary" onclick="updateLocationFields('Trả hàng')">Trả hàng</button>
+                    </div>
+                  </div>
+                  <div class="col-md-3 mb-3">
                     <label for="soPhieu" class="form-label">Số phiếu:</label>
                     <input type="text" class="form-control" id="soPhieu" name="soPhieu" required>
-                </div>
-                <div class="mb-3">
+                  </div>
+                  <div class="col-md-3 mb-3">
                     <label for="ngayThang" class="form-label">Ngày tháng:</label>
                     <input type="date" class="form-control" id="ngayThang" name="ngayThang" required>
-                </div>
-                <div class="mb-3">
+                  </div>
+                  <div class="col-md-3 mb-3">
                     <label for="tuDau" class="form-label">Từ đâu:</label>
                     <input type="text" class="form-control" id="tuDau" name="tuDau" required>
+                  </div>
                 </div>
-                <div class="mb-3">
+                
+                <div class="row">
+                  <div class="col-md-3 mb-3">
                     <label for="denDau" class="form-label">Đến đâu:</label>
                     <input type="text" class="form-control" id="denDau" name="denDau" required>
-                </div>
-                <div class="mb-3">
+                  </div>
+                  <div class="col-md-3 mb-3">
                     <label for="dienGiai" class="form-label">Diễn giải:</label>
                     <input type="text" class="form-control" id="dienGiai" name="dienGiai" required>
-                </div>
-                <div class="mb-3">
+                  </div>
+                  <div class="col-md-3 mb-3">
                     <label for="chungTuDiKem" class="form-label">Chứng từ đi kèm:</label>
                     <select class="form-select" id="chungTuDiKem" name="chungTuDiKem" required></select>
+                  </div>
+                  <div class="col-md-3 mb-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Thêm mới</button>
+                  </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Thêm mới</button>
-            </form>
+              </form>
 
             <h3>Packing List cho INVOICE đã chọn</h3>
-            <table id="selectedPackingListTable" class="table table-striped table-bordered" style="width: 100%;">
+            <table id="selectedPackingListTable" class="table table-bordered" style="width: 100%;">
                 <thead>
                     <tr>
                         <th>TỜ KHAI</th>
@@ -180,7 +192,57 @@
                 columns: packingListData[0].map(header => ({ title: header }))
             });
         }
+        function updateLocationFields(nghiepVu) {
+            const tuDau = document.getElementById('tuDau');
+            const denDau = document.getElementById('denDau');
 
+            if (nghiepVu === 'Nhập kho') {
+                tuDau.value = 'Kho NCC';
+                denDau.value = 'Kho An Phú';
+            } else if (nghiepVu === 'Xuất kho') {
+                tuDau.value = 'Kho An Phú';
+                denDau.value = 'Kho Khách Hàng';
+            } else if (nghiepVu === 'Chuyển kho') {
+                tuDau.value = '';
+                denDau.value = '';
+            } else if (nghiepVu === 'Trả hàng') {
+                tuDau.value = 'Kho Khách Hàng';
+                denDau.value = 'Kho An Phú';
+            } else {
+                tuDau.value = '';
+                denDau.value = '';
+            }
+
+            updateSoPhieu();
+        }
+
+        function updateSoPhieu() {
+            const nghiepVuButtons = document.querySelectorAll('#nghiepVu .btn');
+            let nghiepVu = '';
+            nghiepVuButtons.forEach(button => {
+                if (button.classList.contains('active')) {
+                    nghiepVu = button.textContent.trim();
+                }
+            });
+
+            const tuDau = document.getElementById('tuDau').value;
+            const denDau = document.getElementById('denDau').value;
+            const ngayThang = document.getElementById('ngayThang').value.replace(/-/g, '.');
+
+            if (nghiepVu === 'Nhập kho') {
+                document.getElementById('soPhieu').value = `PNK-${tuDau}-${denDau}-${ngayThang}`;
+            } else if (nghiepVu === 'Xuất kho') {
+                document.getElementById('soPhieu').value = `PXK-${tuDau}-${denDau}-${ngayThang}`;
+            } else if (nghiepVu === 'Chuyển kho') {
+                document.getElementById('soPhieu').value = `PCK-${tuDau}-${denDau}-${ngayThang}`;
+            } else if (nghiepVu === 'Trả hàng') {
+                document.getElementById('soPhieu').value = `PTH-${tuDau}-${denDau}-${ngayThang}`;
+            }
+        }
+
+        document.getElementById('tuDau').addEventListener('change', updateSoPhieu);
+        document.getElementById('denDau').addEventListener('change', updateSoPhieu);
+        document.getElementById('ngayThang').addEventListener('change', updateSoPhieu);
         function initializePNKForm() {
             const invoices = [...new Set(packingListData.slice(1).map(row => row[7]))];
             const select = document.getElementById('chungTuDiKem');
@@ -203,7 +265,7 @@
                     {
                         title: 'Chọn',
                         render: function (data, type, row) {
-                            return '<input type="checkbox" value="' + row[11] + '">';
+                            return '<input type="checkbox" value="' + row[11] + '" checked>';
                         }
                     }
                 ]),
@@ -290,7 +352,7 @@
                     { data: 5, title: "Diễn giải" },
                     { data: 6, title: "Chứng từ đi kèm" },
                     { data: 7, title: "Mã kiện (NB)" },
-                    
+
                 ]
             });
         }
@@ -319,7 +381,7 @@
             try {
                 const response = await fetch('https://script.google.com/macros/s/AKfycbx4cpvJhB21RYDPWWJP65ecAdx1vB05oF7-ZK7pRLK4fgofV5-LcRQwyUS-wa-M99w3/exec', {
                     method: 'POST',
-                  
+
                     body: `action=deletePNK&row=${row}`
                 });
 
