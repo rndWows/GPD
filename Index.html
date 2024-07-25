@@ -4,19 +4,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý phiếu xuất nhập</title>
+    <title>Packing List and PNK Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link rel="preload" as="image" href="https://gophuongdong.com/wp-content/themes/app/assets/img/common/logo.svg" fetchpriority="high">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
     <script src="https://code.jquery.com/jquery-3.5.1.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js" defer></script>
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"
         defer></script>
     <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
         .tab {
             overflow: hidden;
             border: 1px solid #ccc;
             background-color: #f1f1f1;
+            border-radius: 8px 8px 0 0;
         }
 
         .tab button {
@@ -27,6 +52,7 @@
             cursor: pointer;
             padding: 14px 16px;
             transition: 0.3s;
+            font-size: 16px;
         }
 
         .tab button:hover {
@@ -34,14 +60,64 @@
         }
 
         .tab button.active {
-            background-color: #ccc;
+            background-color: #3498db;
+            color: white;
         }
 
         .tabcontent {
             display: none;
-            padding: 6px 12px;
+            padding: 20px;
             border: 1px solid #ccc;
             border-top: none;
+            border-radius: 0 0 8px 8px;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        button:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
         }
 
         #loadingOverlay {
@@ -60,20 +136,8 @@
         #loadingOverlay>div {
             background-color: white;
             padding: 20px;
-            border-radius: 5px;
-        }
-
-        .pnkRow table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .pnkRow td {
-            padding: 5px;
-        }
-
-        .pnkRow select {
-            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
         }
 
         .select2-container {
@@ -82,85 +146,116 @@
 
         .select2-container--default .select2-selection--single {
             height: 38px;
-            border: 1px solid #ced4da;
+            border: 1px solid #ddd;
             border-radius: 4px;
         }
 
         .select2-container--default .select2-selection--single .select2-selection__rendered {
             line-height: 38px;
-            padding-left: 12px;
-            color: #495057;
         }
 
         .select2-container--default .select2-selection--single .select2-selection__arrow {
             height: 36px;
         }
 
-        .select2-container--default .select2-results__option--highlighted[aria-selected] {
-            background-color: #007bff;
+        .btn-icon {
+            border: none;
+            background: none;
+            cursor: pointer;
+            padding: 5px;
         }
 
-        .select2-dropdown {
-            border: 1px solid #ced4da;
+        .btn-icon .fas {
+            font-size: 18px;
+            color: #3498db;
         }
 
-        .select2-search__field {
-            padding: 6px 12px;
-            border: 1px solid #ced4da !important;
-            border-radius: 4px;
+        .btn-icon.edit-btn:hover .fas {
+            color: #2980b9;
+        }
+
+        .btn-icon.delete-btn:hover .fas {
+            color: #e74c3c;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-group input,
+        .input-group select {
+            flex: 1;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .actions button {
+            width: 30%;
         }
     </style>
 </head>
 
 <body>
-    <div id="loadingOverlay">
-        <div>Hệ thống đang tải dữ liệu...</div>
+    <div class="container">
+        <div id="loadingOverlay">
+            <div>Hệ thống đang tải dữ liệu...</div>
+        </div>
+
+        <div class="tab">
+            <button class="tablinks" onclick="openTab(event, 'PackingList')">Packing List</button>
+            <button class="tablinks" onclick="openTab(event, 'PNK')">PNK</button>
+        </div>
+
+        <div id="PackingList" class="tabcontent">
+            <h2>Packing List</h2>
+            <table id="packingListTable" class="display" style="width:100%">
+                <thead>
+                    <tr id="packingListHeader"></tr>
+                </thead>
+                <tbody id="packingListBody"></tbody>
+            </table>
+        </div>
+
+        <div id="PNK" class="tabcontent">
+            <h2>PNK</h2>
+            <form id="pnkForm">
+                <div id="pnkCommonInputs" class="input-group">
+                    <!-- Các input chung sẽ được thêm vào đây bằng JavaScript -->
+                </div>
+                <div id="pnkInputs" class="input-group">
+                    <select name="Chứng từ đi kèm" id="chungTuSelect"></select>
+                </div>
+                <div id="filteredPackingListContainer">
+                    <table id="filteredPackingListTable">
+                        <thead>
+                            <tr>
+                                <!-- Headers sẽ được thêm vào đây bằng JavaScript -->
+                            </tr>
+                        </thead>
+                        <tbody id="filteredPackingListBody"></tbody>
+                    </table>
+                </div>
+                <div class="actions">
+                    <button type="button" id="addPNKButton">Thêm PNK</button>
+                    <button type="button" id="updatePNKButton">Cập nhật PNK</button>
+                    <button type="button" onclick="clearPNKForm()">Xóa Form</button>
+                </div>
+            </form>
+            <table id="pnkTable" class="display" style="width:100%">
+                <thead>
+                    <tr id="pnkHeader"></tr>
+                </thead>
+                <tbody id="pnkBody"></tbody>
+            </table>
+        </div>
     </div>
 
-
-    <div class="tab">
-        <button class="tablinks" onclick="openTab(event, 'PackingList')">Packing List</button>
-        <button class="tablinks" onclick="openTab(event, 'PNK')">PNK</button>
-    </div>
-
-    <div id="PackingList" class="tabcontent">
-        <h2>Packing List</h2>
-        <table id="packingListTable" class="display" style="width:100%">
-            <thead>
-                <tr id="packingListHeader"></tr>
-            </thead>
-            <tbody id="packingListBody"></tbody>
-        </table>
-    </div>
-    <div id="PNK" class="tabcontent">
-        <h2>PNK</h2>
-        <form id="pnkForm">
-            <div id="pnkCommonInputs">
-                <!-- Các input chung sẽ được thêm vào đây bằng JavaScript -->
-            </div>
-            <div id="pnkInputs">
-                <select name="Chứng từ đi kèm" id="chungTuSelect"></select>
-            </div>
-            <div id="filteredPackingListContainer">
-                <table id="filteredPackingListTable">
-                    <thead>
-                        <tr>
-                            <!-- Headers sẽ được thêm vào đây bằng JavaScript -->
-                        </tr>
-                    </thead>
-                    <tbody id="filteredPackingListBody"></tbody>
-                </table>
-            </div>
-            <button type="submit">Add/Update PNK</button>
-            <button type="button" onclick="clearPNKForm()">Clear Form</button>
-        </form>
-        <table id="pnkTable" class="display" style="width:100%">
-            <thead>
-                <tr id="pnkHeader"></tr>
-            </thead>
-            <tbody id="pnkBody"></tbody>
-        </table>
-    </div>
 
 
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
@@ -224,7 +319,14 @@
             initializeData();
         });
 
-
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
         function openTab(evt, tabName) {
             if (packingListData && pnkData) {
                 var i, tabcontent, tablinks;
@@ -329,12 +431,27 @@
             pnkTable = $('#pnkTable').DataTable({
                 data: pnkData.slice(1),
                 columns: [
-                    ...headers.map(header => ({ title: header })),
+                    ...headers.map((header, index) => ({
+                        title: header,
+                        render: function (data, type, row) {
+                            // Kiểm tra nếu đây là cột ngày tháng (giả sử là cột thứ 3, index 2)
+                            if (index === 2) {
+                                return formatDate(data);
+                            }
+                            return data;
+                        }
+                    })),
                     {
-                        title: 'Actions',
+                        title: 'Thao tác',
                         render: function (data, type, row, meta) {
-                            return '<button onclick="editPNK(' + (meta.row + 2) + ')">Edit</button> ' +
-                                '<button onclick="deletePNK(' + (meta.row + 2) + ')">Delete</button>';
+                            return `
+                        <button onclick="editPNK(${meta.row + 2})" class="btn-icon edit-btn" title="Sửa">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deletePNK(${meta.row + 2})" class="btn-icon delete-btn" title="Xóa">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    `;
                         }
                     }
                 ],
@@ -369,22 +486,78 @@
         }
         let selectedPackingList = [];
 
-
         function setupPNKForm() {
             console.log("Setting up PNK Form");
 
-            const commonHeaders = ['Nghiệp vụ', 'Số phiếu', 'Ngày', 'Từ đâu', 'Đến đâu', 'Diễn giải', 'Chứng từ đi kèm'];
             const commonForm = document.getElementById('pnkCommonInputs');
-
             if (commonForm) {
-                commonForm.innerHTML = '';
-                commonHeaders.forEach(header => {
-                    const input = document.createElement('input');
-                    input.type = header === 'Ngày' ? 'date' : 'text';
-                    input.name = header;
-                    input.placeholder = header;
-                    commonForm.appendChild(input);
-                });
+                commonForm.innerHTML = `
+            <input type="hidden" id="editingRowId" name="editingRowId">
+            <select id="nghiepVu" name="Nghiệp vụ">
+                <option value="">Chọn nghiệp vụ</option>
+                <option value="Nhập kho">Nhập kho</option>
+                <option value="Xuất kho">Xuất kho</option>
+                <option value="Chuyển kho">Chuyển kho</option>
+                <option value="Trả hàng">Trả hàng</option>
+            </select>
+            <input type="text" id="soPhieu" name="Số phiếu" readonly>
+            <input type="date" id="ngayThang" name="Ngày tháng">
+            <input type="text" id="tuDau" name="Từ đâu">
+            <input type="text" id="denDau" name="Đến">
+            <input type="text" id="dienGiai" name="Diễn giải">
+        `;
+                const nghiepVuSelect = document.getElementById('nghiepVu');
+                const soPhieuInput = document.getElementById('soPhieu');
+                const ngayThangInput = document.getElementById('ngayThang');
+                const tuDauInput = document.getElementById('tuDau');
+                const denDauInput = document.getElementById('denDau');
+
+                nghiepVuSelect.addEventListener('change', updateFields);
+                ngayThangInput.addEventListener('change', updateSoPhieu);
+
+                function updateFields() {
+                    const nghiepVu = nghiepVuSelect.value;
+                    if (nghiepVu === 'Nhập kho') {
+                        tuDauInput.value = 'Kho NCC';
+                        denDauInput.value = 'Kho An Phú';
+                    } else if (nghiepVu === 'Xuất kho') {
+                        tuDauInput.value = 'Kho An Phú';
+                        denDauInput.value = 'Kho Khách Hàng';
+                    } else if (nghiepVu === 'Chuyển kho') {
+                        tuDauInput.value = '';
+                        denDauInput.value = '';
+                    } else if (nghiepVu === 'Trả hàng') {
+                        tuDauInput.value = 'Kho Khách Hàng';
+                        denDauInput.value = 'Kho An Phú';
+                    } else {
+                        tuDauInput.value = '';
+                        denDauInput.value = '';
+                    }
+                    updateSoPhieu();
+                }
+
+                function updateSoPhieu() {
+                    const nghiepVu = nghiepVuSelect.value;
+                    const ngayThang = ngayThangInput.value.replace(/-/g, '');
+                    const tuDau = tuDauInput.value;
+                    const denDau = denDauInput.value;
+
+                    if (nghiepVu === 'Nhập kho') {
+                        soPhieuInput.value = `PNK-${tuDau}-${denDau}-${ngayThang}`;
+                    } else if (nghiepVu === 'Xuất kho') {
+                        soPhieuInput.value = `PXK-${tuDau}-${denDau}-${ngayThang}`;
+                    } else if (nghiepVu === 'Chuyển kho') {
+                        soPhieuInput.value = `PCK-${tuDau}-${denDau}-${ngayThang}`;
+                    } else if (nghiepVu === 'Trả hàng') {
+                        soPhieuInput.value = `PTH-${tuDau}-${denDau}-${ngayThang}`;
+                    } else {
+                        soPhieuInput.value = '';
+                    }
+                }
+
+                // Set default date to today
+                const today = new Date().toISOString().split('T')[0];
+                ngayThangInput.value = today;
             } else {
                 console.error("Common form element not found");
             }
@@ -434,11 +607,26 @@
                 console.error("Filtered packing list table not found");
             }
 
+            const addPNKButton = document.getElementById('addPNKButton');
+            const updatePNKButton = document.getElementById('updatePNKButton');
+
+            if (addPNKButton) {
+                addPNKButton.onclick = addPNK;
+            } else {
+                console.error("Add PNK button not found");
+            }
+
+            if (updatePNKButton) {
+                updatePNKButton.onclick = updatePNK;
+                updatePNKButton.style.display = 'none'; // Hide update button initially
+            } else {
+                console.error("Update PNK button not found");
+            }
+
             const pnkForm = document.getElementById('pnkForm');
             if (pnkForm) {
                 pnkForm.onsubmit = (e) => {
                     e.preventDefault();
-                    addOrUpdatePNK();
                 };
             } else {
                 console.error("PNK form not found");
@@ -447,7 +635,77 @@
             console.log("PNK Form setup completed");
         }
 
+        async function addPNK() {
+            const pnkData = getPNKFormData();
+            // Thực hiện logic thêm mới PNK
+            await sendPNKData('add', pnkData);
+        }
+        async function updatePNK() {
+            const editingRowId = document.getElementById('editingRowId').value;
+            if (!editingRowId) {
+                alert('Không có dòng nào đang được chỉnh sửa.');
+                return;
+            }
 
+            const pnkData = getPNKFormData();
+            pnkData.rowId = editingRowId;
+
+            // Thực hiện logic cập nhật PNK
+            await sendPNKData('update', pnkData);
+        }
+        function getPNKFormData() {
+            const formData = {};
+
+            // Get common input values
+            const commonInputs = document.querySelectorAll('#pnkCommonInputs input');
+            commonInputs.forEach(input => {
+                formData[input.name] = input.value;
+            });
+
+            // Get selected Chứng từ đi kèm
+            const chungTuSelect = document.getElementById('chungTuSelect');
+            if (chungTuSelect) {
+                formData['Chứng từ đi kèm'] = chungTuSelect.value;
+            }
+
+            // Get filtered packing list data
+            const filteredPackingListRows = document.querySelectorAll('#filteredPackingListBody tr');
+            const packingListData = Array.from(filteredPackingListRows).map(row => {
+                const cells = row.querySelectorAll('td');
+                return {
+                    'Mã kiện (NB)': cells[11].textContent, // Assuming Mã kiện (NB) is in the 12th column
+                    // Add other relevant data from the row
+                };
+            });
+
+            formData['PackingListData'] = packingListData;
+
+            console.log("Form data collected:", formData);
+            return formData;
+        }
+        async function sendPNKData(action, data) {
+            showLoading(true);
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: action === 'add' ? 'addPNK' : 'updatePNK',
+                        data: data
+                    })
+                });
+                const result = await response.text();
+                console.log(`${action.charAt(0).toUpperCase() + action.slice(1)} result:`, result);
+
+                await refreshPNKData();
+                renderPNKTable();
+                clearPNKForm();
+            } catch (error) {
+                console.error(`Error ${action}ing PNK:`, error);
+                alert(`Error: ${error.message}`);
+            } finally {
+                showLoading(false);
+            }
+        }
         function updateChungTuOptions() {
             const chungTuSelect = document.getElementById('chungTuSelect');
             if (chungTuSelect) {
@@ -496,14 +754,19 @@
             // Thêm các hàng mới
             filteredData.forEach((item, index) => {
                 const row = document.createElement('tr');
-                row.innerHTML = item.map(cell => `<td>${cell}</td>`).join('') +
+                row.innerHTML = item.map((cell, cellIndex) => {
+                    // Kiểm tra nếu đây là cột ngày tháng (giả sử là cột thứ 3, index 2)
+                    if (cellIndex === 2) {
+                        return `<td>${formatDate(cell)}</td>`;
+                    }
+                    return `<td>${cell}</td>`;
+                }).join('') +
                     `<td><button type="button" onclick="removeFilteredPackingListRow(${index})">Xóa</button></td>`;
                 filteredPackingListBody.appendChild(row);
             });
 
             console.log("Rows added:", filteredPackingListBody.children.length);
         }
-
 
         function removeFilteredPackingListRow(index) {
             const filteredPackingListBody = document.getElementById('filteredPackingListBody');
@@ -708,20 +971,28 @@
             pnkData = JSON.parse(pnkText);
         }
         function clearPNKForm() {
-            const commonInputs = document.querySelectorAll('#pnkCommonInputs input');
+            const commonInputs = document.querySelectorAll('#pnkCommonInputs input, #pnkCommonInputs select');
             commonInputs.forEach(input => {
-                input.value = '';
+                if (input.type !== 'hidden') {
+                    input.value = '';
+                }
             });
+
+            document.getElementById('editingRowId').value = '';
 
             const chungTuSelect = document.getElementById('chungTuSelect');
             if (chungTuSelect) {
                 chungTuSelect.value = '';
+                $(chungTuSelect).trigger('change'); // Nếu bạn đang sử dụng Select2
             }
 
             const filteredPackingListBody = document.getElementById('filteredPackingListBody');
             if (filteredPackingListBody) {
                 filteredPackingListBody.innerHTML = '';
             }
+
+            document.getElementById('addPNKButton').style.display = 'inline-block';
+            document.getElementById('updatePNKButton').style.display = 'none';
         }
         function logFormData() {
             const form = document.getElementById('pnkForm');
@@ -732,44 +1003,86 @@
             }
         }
 
-        function editPNK(row) {
-            const rowData = pnkTable.row(row - 2).data();
+
+        function editPNK(rowIndex) {
+            const rowData = pnkTable.row(rowIndex - 2).data();
             const form = document.getElementById('pnkForm');
             const inputs = form.querySelectorAll('input, select');
 
+            // Xóa tất cả các hàng hiện có trong bảng filteredPackingList
+            const filteredPackingListBody = document.getElementById('filteredPackingListBody');
+            filteredPackingListBody.innerHTML = '';
+
+            // Điền thông tin vào form
             inputs.forEach((input, index) => {
                 if (input.type !== 'submit' && input.type !== 'button') {
-                    input.value = rowData[index] || '';
-                    if (input.tagName === 'SELECT') {
-                        input.dispatchEvent(new Event('change'));
+                    if (input.name === 'Ngày tháng') {
+                        // Kiểm tra xem giá trị có phải là chuỗi và có đúng định dạng không
+                        if (typeof rowData[index] === 'string' && rowData[index].includes('/')) {
+                            try {
+                                const [day, month, year] = rowData[index].split('/');
+                                input.value = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+                            } catch (error) {
+                                console.error('Error parsing date:', error);
+                                input.value = ''; // Nếu có lỗi, để trống trường này
+                            }
+                        } else if (rowData[index] instanceof Date) {
+                            // Nếu giá trị là đối tượng Date
+                            input.value = rowData[index].toISOString().split('T')[0];
+                        } else {
+                            console.warn('Unexpected date format:', rowData[index]);
+                            input.value = ''; // Nếu không phải chuỗi hoặc Date, để trống trường này
+                        }
+                    } else {
+                        input.value = rowData[index] || '';
                     }
                 }
             });
 
+            // Thêm một hàng mới vào bảng filteredPackingList với Mã kiện (NB)
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = rowData.map((cell, index) => {
+                if (pnkData[0][index] === 'Mã kiện (NB)') {
+                    return `<td>${cell}</td>`;
+                }
+                return '<td></td>';
+            }).join('') + '<td></td>'; // Cột cuối cùng cho nút xóa (trống trong trường hợp này)
+            filteredPackingListBody.appendChild(newRow);
+
+            // Hiển thị nút cập nhật và ẩn nút thêm mới
+            document.getElementById('addPNKButton').style.display = 'none';
+            document.getElementById('updatePNKButton').style.display = 'inline-block';
+
+            // Lưu ID của dòng đang chỉnh sửa
+            document.getElementById('editingRowId').value = rowIndex;
+
             console.log("Editing row:", rowData);
         }
-        async function deletePNK(row) {
-            if (confirm('Are you sure you want to delete this row?')) {
+
+        async function deletePNK(rowIndex) {
+            // Kiểm tra xem rowIndex có phải là dòng tiêu đề hoặc dòng đầu tiên không
+            if (rowIndex <= 2) {
+                alert('Không thể xóa dòng tiêu đề hoặc dòng đầu tiên!');
+                return;
+            }
+
+            if (confirm('Bạn có chắc chắn muốn xóa dòng này không?')) {
                 showLoading(true);
                 try {
                     const response = await fetch(API_URL, {
                         method: 'POST',
-
-                        body: JSON.stringify({ action: 'deletePNK', row: row })
+                        body: JSON.stringify({ action: 'deletePNK', row: rowIndex })
                     });
                     const result = await response.text();
-                    console.log("Delete result:", result);
+                    console.log("Kết quả xóa:", result);
 
-                    // Refresh PNK data
-                    const pnkResponse = await fetch(`${API_URL}?action=getPNK`);
-                    const pnkText = await pnkResponse.text();
-                    pnkData = JSON.parse(pnkText);
-
+                    // Làm mới dữ liệu PNK
+                    await refreshPNKData();
                     renderPNKTable();
-                    showLoading(false);
                 } catch (error) {
-                    console.error("Error deleting PNK:", error);
-                    alert(`Error: ${error.message}`);
+                    console.error("Lỗi khi xóa PNK:", error);
+                    alert(`Lỗi: ${error.message}`);
+                } finally {
                     showLoading(false);
                 }
             }
