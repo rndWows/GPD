@@ -1,1099 +1,342 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Packing List and PNK Management</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
-    <script src="https://code.jquery.com/jquery-3.5.1.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js" defer></script>
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"
-        defer></script>
+    <title>Quản lý Packing List và PNK</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 20px;
+        .tab {
+            display: none;
+        }
+
+        .tab.active {
+            display: block;
         }
 
         .container {
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        h2 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-        }
-
-        .tab {
-            overflow: hidden;
-            border: 1px solid #ccc;
-            background-color: #f1f1f1;
-            border-radius: 8px 8px 0 0;
-        }
-
-        .tab button {
-            background-color: inherit;
-            float: left;
-            border: none;
-            outline: none;
-            cursor: pointer;
-            padding: 14px 16px;
-            transition: 0.3s;
-            font-size: 16px;
-        }
-
-        .tab button:hover {
-            background-color: #ddd;
-        }
-
-        .tab button.active {
-            background-color: #3498db;
-            color: white;
-        }
-
-        .tabcontent {
-            display: none;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-top: none;
-            border-radius: 0 0 8px 8px;
-        }
-
-        input[type="text"],
-        input[type="date"],
-        select {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-
-        button {
-            background-color: #3498db;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #2980b9;
-        }
-
-        button:disabled {
-            background-color: #bdc3c7;
-            cursor: not-allowed;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
             margin-top: 20px;
-        }
-
-        th,
-        td {
-            text-align: left;
-            padding: 12px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-
-        #loadingOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        #loadingOverlay>div {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .select2-container {
-            width: 100% !important;
-        }
-
-        .select2-container--default .select2-selection--single {
-            height: 38px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-
-        .select2-container--default .select2-selection--single .select2-selection__rendered {
-            line-height: 38px;
-        }
-
-        .select2-container--default .select2-selection--single .select2-selection__arrow {
-            height: 36px;
-        }
-
-        .btn-icon {
-            border: none;
-            background: none;
-            cursor: pointer;
-            padding: 5px;
-        }
-
-        .btn-icon .fas {
-            font-size: 18px;
-            color: #3498db;
-        }
-
-        .btn-icon.edit-btn:hover .fas {
-            color: #2980b9;
-        }
-
-        .btn-icon.delete-btn:hover .fas {
-            color: #e74c3c;
-        }
-
-        .input-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .input-group input,
-        .input-group select {
-            flex: 1;
-        }
-
-        .actions {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-
-        .actions button {
-            width: 30%;
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <div id="loadingOverlay">
-            <div>Hệ thống đang tải dữ liệu...</div>
-        </div>
+    <div class="">
+        <ul class="nav nav-tabs mb-3">
+            <li class="nav-item">
+                <a class="nav-link active" onclick="showTab('packingList')" href="#">Packing List</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" onclick="showTab('pnk')" href="#">PNK</a>
+            </li>
+        </ul>
 
-        <div class="tab">
-            <button class="tablinks" onclick="openTab(event, 'PackingList')">Packing List</button>
-            <button class="tablinks" onclick="openTab(event, 'PNK')">PNK</button>
-        </div>
-
-        <div id="PackingList" class="tabcontent">
+        <div id="packingList" class="tab active">
             <h2>Packing List</h2>
-            <table id="packingListTable" class="display" style="width:100%">
+            <table id="packingListTable" class="table table-striped table-bordered" style="width: 100%;">
                 <thead>
-                    <tr id="packingListHeader"></tr>
+                    <tr>
+                        <th>TỜ KHAI</th>
+                        <th>NGÀY TỜ KHAI</th>
+                        <th>ĐƠN GIÁ (USD)</th>
+                        <th>ĐƠN GIÁ (EUR)</th>
+                        <th>TỶ GIÁ</th>
+                        <th>FSC</th>
+                        <th>XUẤT XỨ</th>
+                        <th>INVOICE</th>
+                        <th>TÊN NHÀ CUNG CẤP</th>
+                        <th>SỐ CONTAINER</th>
+                        <th>TÊN GỖ</th>
+                        <th>MÃ KIỆN (dùng cho file nội bộ)</th>
+                        <th>KHỐI LƯỢNG THỰC TẾ</th>
+                        <th>SỐ THANH THỰC TẾ</th>
+                        <th>CHIỀU DÀI THỰC TẾ</th>
+                        <th>CHIỀU RỘNG THỰC TẾ</th>
+                        <th>MÃ KIỆN TRÊN PL</th>
+                        <th>Trạng thái kiện</th>
+                    </tr>
                 </thead>
-                <tbody id="packingListBody"></tbody>
+                <tbody></tbody>
             </table>
         </div>
 
-        <div id="PNK" class="tabcontent">
+        <div id="pnk" class="tab">
             <h2>PNK</h2>
-            <form id="pnkForm">
-                <div id="pnkCommonInputs" class="input-group">
-                    <!-- Các input chung sẽ được thêm vào đây bằng JavaScript -->
+            <form id="pnkForm" class="mb-4">
+                <div class="mb-3">
+                    <label for="nghiepVu" class="form-label">Nghiệp vụ:</label>
+                    <input type="text" class="form-control" id="nghiepVu" name="nghiepVu" required>
                 </div>
-                <div id="pnkInputs" class="input-group">
-                    <select name="Chứng từ đi kèm" id="chungTuSelect"></select>
+                <div class="mb-3">
+                    <label for="soPhieu" class="form-label">Số phiếu:</label>
+                    <input type="text" class="form-control" id="soPhieu" name="soPhieu" required>
                 </div>
-                <div id="filteredPackingListContainer">
-                    <table id="filteredPackingListTable">
-                        <thead>
-                            <tr>
-                                <!-- Headers sẽ được thêm vào đây bằng JavaScript -->
-                            </tr>
-                        </thead>
-                        <tbody id="filteredPackingListBody"></tbody>
-                    </table>
+                <div class="mb-3">
+                    <label for="ngayThang" class="form-label">Ngày tháng:</label>
+                    <input type="date" class="form-control" id="ngayThang" name="ngayThang" required>
                 </div>
-                <div class="actions">
-                    <button type="button" id="addPNKButton" onclick="addPNK()">Thêm PNK</button>
-                    <button type="button" id="updatePNKButton" onclick="updatePNK()" style="display: none;">Cập nhật
-                        PNK</button>
-                    <button type="button" onclick="clearPNKForm()">Xóa Form</button>
+                <div class="mb-3">
+                    <label for="tuDau" class="form-label">Từ đâu:</label>
+                    <input type="text" class="form-control" id="tuDau" name="tuDau" required>
                 </div>
+                <div class="mb-3">
+                    <label for="denDau" class="form-label">Đến đâu:</label>
+                    <input type="text" class="form-control" id="denDau" name="denDau" required>
+                </div>
+                <div class="mb-3">
+                    <label for="dienGiai" class="form-label">Diễn giải:</label>
+                    <input type="text" class="form-control" id="dienGiai" name="dienGiai" required>
+                </div>
+                <div class="mb-3">
+                    <label for="chungTuDiKem" class="form-label">Chứng từ đi kèm:</label>
+                    <select class="form-select" id="chungTuDiKem" name="chungTuDiKem" required></select>
+                </div>
+                <button type="submit" class="btn btn-primary">Thêm mới</button>
             </form>
-            <table id="pnkTable" class="display" style="width:100%">
+
+            <h3>Packing List cho INVOICE đã chọn</h3>
+            <table id="selectedPackingListTable" class="table table-striped table-bordered" style="width: 100%;">
                 <thead>
-                    <tr id="pnkHeader"></tr>
+                    <tr>
+                        <th>TỜ KHAI</th>
+                        <th>NGÀY TỜ KHAI</th>
+                        <th>ĐƠN GIÁ (USD)</th>
+                        <th>ĐƠN GIÁ (EUR)</th>
+                        <th>TỶ GIÁ</th>
+                        <th>FSC</th>
+                        <th>XUẤT XỨ</th>
+                        <th>INVOICE</th>
+                        <th>TÊN NHÀ CUNG CẤP</th>
+                        <th>SỐ CONTAINER</th>
+                        <th>TÊN GỖ</th>
+                        <th>MÃ KIỆN (dùng cho file nội bộ)</th>
+                        <th>KHỐI LƯỢNG THỰC TẾ</th>
+                        <th>SỐ THANH THỰC TẾ</th>
+                        <th>CHIỀU DÀI THỰC TẾ</th>
+                        <th>CHIỀU RỘNG THỰC TẾ</th>
+                        <th>MÃ KIỆN TRÊN PL</th>
+                        <th>Trạng thái kiện</th>
+                        <th>Chọn</th>
+                    </tr>
                 </thead>
-                <tbody id="pnkBody"></tbody>
+                <tbody></tbody>
+            </table>
+
+            <h3>Danh sách PNK</h3>
+            <button id="saveButton" onclick="savePNKData()" class="btn btn-success mb-2">Lưu dữ liệu PNK vào
+                database</button>
+            <table id="pnkTable" class="table table-striped table-bordered" style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th>Nghiệp vụ</th>
+                        <th>Số phiếu</th>
+                        <th>Ngày tháng</th>
+                        <th>Từ đâu</th>
+                        <th>Đến đâu</th>
+                        <th>Diễn giải</th>
+                        <th>Chứng từ đi kèm</th>
+                        <th>Mã kiện (NB)</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
             </table>
         </div>
     </div>
 
-
-
-    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-    <script type="text/javascript" charset="utf8"
-        src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
     <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbx4cpvJhB21RYDPWWJP65ecAdx1vB05oF7-ZK7pRLK4fgofV5-LcRQwyUS-wa-M99w3/exec';
-        let packingListData = null;
-        let pnkData = null;
-        let packingListTable = null;
-        let pnkTable = null;
-        let rowsToDelete = [];
+        let packingListData = [];
+        let pnkData = [];
+        let tempPNKData = [];
 
-        async function initializeData() {
-            showLoading(true);
+        function showTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        async function fetchData() {
             try {
-                packingListData = await fetchData('getPackingList');
-                pnkData = await fetchData('getPNK');
-                setupPNKForm();
-                document.getElementsByClassName('tablinks')[0].click();
-            } finally {
-                showLoading(false);
-            }
-        }
-        async function fetchData(action) {
-            const response = await fetch(`${API_URL}?action=${action}`);
-            if (!response.ok) throw new Error(`Failed to fetch ${action} data`);
-            return JSON.parse(await response.text());
-        }
-
-
-        function showLoading(show) {
-            document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            if (typeof jQuery !== 'undefined') {
-                $(document).ready(function () {
-                    $('#chungTuSelect').select2({
-                        placeholder: "Chọn Chứng từ đi kèm",
-                        allowClear: true,
-                        width: 'resolve'
-                    });
-                });
-            } else {
-                console.error('jQuery is not loaded');
-            }
-            initializeData();
-        });
-
-        function formatDate(dateString) {
-            if (!dateString) return '';
-            const date = new Date(dateString);
-            return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
-        }
-        function openTab(evt, tabName) {
-            if (!packingListData || !pnkData) {
-                console.log("Data not loaded yet");
-                return;
-            }
-
-            const tabcontent = document.getElementsByClassName("tabcontent");
-            for (let i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
-            }
-
-            const tablinks = document.getElementsByClassName("tablinks");
-            for (let i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
-            }
-
-            document.getElementById(tabName).style.display = "block";
-            evt.currentTarget.className += " active";
-
-            if (tabName === 'PackingList') {
-                displayPackingList();
-            } else if (tabName === 'PNK') {
-                displayPNK();
-            }
-        }
-
-
-        function displayPackingList() {
-            if (packingListData) {
-                renderPackingListTable();
-            } else {
-                document.getElementById('packingListBody').innerHTML = '<tr><td>No data available</td></tr>';
-            }
-        }
-
-
-        function renderPackingListTable() {
-            const headers = packingListData[0];
-            const headerRow = document.getElementById('packingListHeader');
-            headerRow.innerHTML = headers.map(header => `<th>${header}</th>`).join('');
-
-            if (packingListTable) {
-                packingListTable.destroy();
-            }
-
-            packingListTable = $('#packingListTable').DataTable({
-                data: packingListData.slice(1),
-                columns: headers.map(header => ({ title: header })),
-                pageLength: 100,
-                scrollY: '60vh',
-                scrollCollapse: true,
-                language: {
-                    "decimal": "",
-                    "emptyTable": "Không có dữ liệu trong bảng",
-                    "info": "Hiển thị từ _START_ đến _END_ của _TOTAL_ mục",
-                    "infoEmpty": "Hiển thị từ 0 đến 0 của 0 mục",
-                    "infoFiltered": "(lọc từ _MAX_ mục)",
-                    "infoPostFix": "",
-                    "thousands": ",",
-                    "lengthMenu": "Hiển thị _MENU_ mục",
-                    "loadingRecords": "Đang tải...",
-                    "processing": "Đang xử lý...",
-                    "search": "Tìm kiếm:",
-                    "zeroRecords": "Không tìm thấy kết quả",
-                    "paginate": {
-                        "first": "Đầu tiên",
-                        "last": "Cuối cùng",
-                        "next": "Tiếp",
-                        "previous": "Trước"
-                    },
-                    "aria": {
-                        "sortAscending": ": sắp xếp tăng dần",
-                        "sortDescending": ": sắp xếp giảm dần"
-                    }
-                }
-            });
-        }
-        function displayPNK() {
-            if (pnkData) {
-                renderPNKTable();
-            } else {
-                document.getElementById('pnkBody').innerHTML = '<tr><td>No data available in table</td></tr>';
-            }
-        }
-
-        function renderPNKTable() {
-            const headers = pnkData[0];
-            const headerRow = document.getElementById('pnkHeader');
-            headerRow.innerHTML = headers.map(header => `<th>${header}</th>`).join('') + '<th>Actions</th>';
-
-            if (pnkTable) {
-                pnkTable.destroy();
-            }
-
-            pnkTable = $('#pnkTable').DataTable({
-                data: pnkData.slice(1),
-                columns: [
-                    ...headers.map((header, index) => ({
-                        title: header,
-                        render: function (data, type, row) {
-                            // Kiểm tra nếu đây là cột ngày tháng (giả sử là cột thứ 3, index 2)
-                            if (index === 2) {
-                                return formatDate(data);
-                            }
-                            return data;
-                        }
-                    })),
-                    {
-                        title: 'Thao tác',
-                        render: function (data, type, row, meta) {
-                            return `
-                        <button onclick="editPNK(${meta.row + 2})" class="btn-icon edit-btn" title="Sửa">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button onclick="deletePNK(${meta.row + 2})" class="btn-icon delete-btn" title="Xóa">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    `;
-                        }
-                    }
-                ],
-                pageLength: 50,
-                scrollY: '50vh',
-                scrollCollapse: true,
-                language: {
-                    "decimal": "",
-                    "emptyTable": "Không có dữ liệu trong bảng",
-                    "info": "Hiển thị từ _START_ đến _END_ của _TOTAL_ mục",
-                    "infoEmpty": "Hiển thị từ 0 đến 0 của 0 mục",
-                    "infoFiltered": "(lọc từ _MAX_ mục)",
-                    "infoPostFix": "",
-                    "thousands": ",",
-                    "lengthMenu": "Hiển thị _MENU_ mục",
-                    "loadingRecords": "Đang tải...",
-                    "processing": "Đang xử lý...",
-                    "search": "Tìm kiếm:",
-                    "zeroRecords": "Không tìm thấy kết quả",
-                    "paginate": {
-                        "first": "Đầu tiên",
-                        "last": "Cuối cùng",
-                        "next": "Tiếp",
-                        "previous": "Trước"
-                    },
-                    "aria": {
-                        "sortAscending": ": sắp xếp tăng dần",
-                        "sortDescending": ": sắp xếp giảm dần"
-                    }
-                }
-            });
-        }
-
-
-        function setupPNKForm() {
-            console.log("Setting up PNK Form");
-
-            const commonForm = document.getElementById('pnkCommonInputs');
-            if (commonForm) {
-                commonForm.innerHTML = `
-            <input type="hidden" id="editingRowId" name="editingRowId">
-            <select id="nghiepVu" name="Nghiệp vụ">
-                <option value="">Chọn nghiệp vụ</option>
-                <option value="Nhập kho">Nhập kho</option>
-                <option value="Xuất kho">Xuất kho</option>
-                <option value="Chuyển kho">Chuyển kho</option>
-                <option value="Trả hàng">Trả hàng</option>
-            </select>
-            <input type="text" id="soPhieu" name="Số phiếu" readonly>
-            <input type="date" id="ngayThang" name="Ngày tháng">
-            <input type="text" id="tuDau" name="Từ đâu">
-            <input type="text" id="denDau" name="Đến">
-            <input type="text" id="dienGiai" name="Diễn giải">
-        `;
-                const nghiepVuSelect = document.getElementById('nghiepVu');
-                const soPhieuInput = document.getElementById('soPhieu');
-                const ngayThangInput = document.getElementById('ngayThang');
-                const tuDauInput = document.getElementById('tuDau');
-                const denDauInput = document.getElementById('denDau');
-
-                nghiepVuSelect.addEventListener('change', updateFields);
-                ngayThangInput.addEventListener('change', updateSoPhieu);
-
-                function updateFields() {
-                    const nghiepVu = nghiepVuSelect.value;
-                    if (nghiepVu === 'Nhập kho') {
-                        tuDauInput.value = 'Kho NCC';
-                        denDauInput.value = 'Kho An Phú';
-                    } else if (nghiepVu === 'Xuất kho') {
-                        tuDauInput.value = 'Kho An Phú';
-                        denDauInput.value = 'Kho Khách Hàng';
-                    } else if (nghiepVu === 'Chuyển kho') {
-                        tuDauInput.value = '';
-                        denDauInput.value = '';
-                    } else if (nghiepVu === 'Trả hàng') {
-                        tuDauInput.value = 'Kho Khách Hàng';
-                        denDauInput.value = 'Kho An Phú';
-                    } else {
-                        tuDauInput.value = '';
-                        denDauInput.value = '';
-                    }
-                    updateSoPhieu();
-                }
-
-                function updateSoPhieu() {
-                    const nghiepVu = nghiepVuSelect.value;
-                    const ngayThang = ngayThangInput.value.replace(/-/g, '');
-                    const tuDau = tuDauInput.value;
-                    const denDau = denDauInput.value;
-
-                    if (nghiepVu === 'Nhập kho') {
-                        soPhieuInput.value = `PNK-${tuDau}-${denDau}-${ngayThang}`;
-                    } else if (nghiepVu === 'Xuất kho') {
-                        soPhieuInput.value = `PXK-${tuDau}-${denDau}-${ngayThang}`;
-                    } else if (nghiepVu === 'Chuyển kho') {
-                        soPhieuInput.value = `PCK-${tuDau}-${denDau}-${ngayThang}`;
-                    } else if (nghiepVu === 'Trả hàng') {
-                        soPhieuInput.value = `PTH-${tuDau}-${denDau}-${ngayThang}`;
-                    } else {
-                        soPhieuInput.value = '';
-                    }
-                }
-
-                // Set default date to today
-                const today = new Date().toISOString().split('T')[0];
-                ngayThangInput.value = today;
-            } else {
-                console.error("Common form element not found");
-            }
-
-            const chungTuSelect = document.getElementById('chungTuSelect');
-            if (chungTuSelect) {
-                // Populate options
-                const uniqueChungTu = [...new Set(packingListData.slice(1).map(item => item[7]))];
-                chungTuSelect.innerHTML = '<option value="">Select Chứng từ</option>' +
-                    uniqueChungTu.map(item => `<option value="${item}">${item}</option>`).join('');
-
-                // Initialize Select2
-                if ($.fn.select2) {
-                    $(chungTuSelect).select2({
-                        placeholder: "Chọn Chứng từ đi kèm",
-                        allowClear: true,
-                        width: 'resolve'
-                    });
-                } else {
-                    console.error('Select2 is not loaded');
-                }
-
-                // Set up change event
-                chungTuSelect.addEventListener('change', function () {
-                    console.log("chungTuSelect changed to:", this.value);
-                    updateFilteredPackingListTable(this.value);
-                });
-                // Nếu bạn đang sử dụng Select2, hãy thêm đoạn này
-                $(chungTuSelect).on('select2:select', function (e) {
-                    console.log("Select2 selection changed to:", e.params.data.id);
-                    updateFilteredPackingListTable(e.params.data.id);
-                });
-            } else {
-                console.error("Chung tu select element not found");
-            }
-
-            // Set up the filtered packing list table
-            const filteredPackingListTable = document.getElementById('filteredPackingListTable');
-            if (filteredPackingListTable) {
-                const headerRow = filteredPackingListTable.querySelector('thead tr');
-                if (headerRow) {
-                    headerRow.innerHTML = packingListData[0].map(header => `<th>${header}</th>`).join('') + '<th>Action</th>';
-                } else {
-                    console.error("Header row not found in filtered packing list table");
-                }
-            } else {
-                console.error("Filtered packing list table not found");
-            }
-
-            const addPNKButton = document.getElementById('addPNKButton');
-            const updatePNKButton = document.getElementById('updatePNKButton');
-
-            if (addPNKButton) {
-                addPNKButton.onclick = addPNK;
-            } else {
-                console.error("Add PNK button not found");
-            }
-
-            if (updatePNKButton) {
-                updatePNKButton.onclick = updatePNK;
-                updatePNKButton.style.display = 'none'; // Hide update button initially
-            } else {
-                console.error("Update PNK button not found");
-            }
-
-            const pnkForm = document.getElementById('pnkForm');
-            if (pnkForm) {
-                pnkForm.onsubmit = (e) => {
-                    e.preventDefault();
-                };
-            } else {
-                console.error("PNK form not found");
-            }
-
-            console.log("PNK Form setup completed");
-        }
-
-        async function addPNK() {
-    try {
-        const pnkData = getPNKFormData();
-        if (!validatePNKData(pnkData)) {
-            alert('Vui lòng điền đầy đủ thông tin cần thiết.');
-            return;
-        }
-        console.log('PNK data before sending:', pnkData);
-        await sendPNKData('add', [pnkData]); // Đặt pnkData trong một mảng
-    } catch (error) {
-        console.error('Error in addPNK:', error);
-        alert(`Lỗi khi thêm PNK: ${error.message}`);
-    }
-}
-        async function addPNK() {
-            const pnkData = getPNKFormData();
-            if (!validatePNKData(pnkData)) {
-                alert('Vui lòng điền đầy đủ thông tin cần thiết.');
-                return;
-            }
-            await sendPNKData('add', pnkData);
-        }
-        async function updatePNK() {
-            const editingRowId = document.getElementById('editingRowId').value;
-            if (!editingRowId) {
-                alert('Không có dòng nào đang được chỉnh sửa.');
-                return;
-            }
-            const pnkData = getPNKFormData();
-            if (!validatePNKData(pnkData)) {
-                alert('Vui lòng điền đầy đủ thông tin cần thiết.');
-                return;
-            }
-            pnkData.rowId = editingRowId;
-            await sendPNKData('update', pnkData);
-        }
-        function validatePNKData(data) {
-            // Thêm logic kiểm tra dữ liệu ở đây
-            return data['Nghiệp vụ'] && data['Số phiếu'] && data['Ngày tháng'];
-        }
-        function getPNKFormData() {
-    const formData = {};
-    const inputs = document.querySelectorAll('#pnkForm input, #pnkForm select');
-    inputs.forEach(input => {
-        if (input.name && input.name !== 'editingRowId') {
-            formData[input.name] = input.value;
-        }
-    });
-
-    // Lấy dữ liệu từ bảng filteredPackingList
-    const filteredPackingListRows = document.querySelectorAll('#filteredPackingListBody tr');
-    const packingListData = Array.from(filteredPackingListRows).map(row => {
-        const cells = row.querySelectorAll('td');
-        return {
-            'Mã kiện (NB)': cells[11] ? cells[11].textContent : '', // Thêm kiểm tra null
-        };
-    });
-
-    formData['PackingListData'] = packingListData;
-
-    console.log('Form data collected:', formData); // Log để kiểm tra
-    return formData;
-}
-        async function sendPNKData(action, data) {
-    showLoading(true);
-    try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                action: action === 'add' ? 'addPNK' : 'updatePNK',
-                data: data
-            })
-        });
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const result = await response.text();
-        console.log(`${action.charAt(0).toUpperCase() + action.slice(1)} result:`, result);
-
-        if (result.includes("successfully")) {
-            alert(`${action === 'add' ? 'Thêm' : 'Cập nhật'} PNK thành công!`);
-            await refreshPNKData();
-            renderPNKTable();
-            clearPNKForm();
-        } else {
-            throw new Error(`${action === 'add' ? 'Thêm' : 'Cập nhật'} PNK thất bại: ${result}`);
-        }
-    } catch (error) {
-        console.error(`Error ${action}ing PNK:`, error);
-        alert(`Lỗi: ${error.message}`);
-    } finally {
-        showLoading(false);
-    }
-}
-        async function refreshPNKData() {
-            pnkData = await fetchData('getPNK');
-        }
-        function updateChungTuOptions() {
-            const chungTuSelect = document.getElementById('chungTuSelect');
-            if (chungTuSelect) {
-                // Update options
-                chungTuSelect.innerHTML = '<option value="">Select Chứng từ</option>' +
-                    [...new Set(packingListData.slice(1).map(item => item[7]))]
-                        .map(item => `<option value="${item}">${item}</option>`)
-                        .join('');
-
-                // Reinitialize Select2
-                $(chungTuSelect).select2('destroy').select2({
-                    placeholder: "Chọn Chứng từ đi kèm",
-                    allowClear: true,
-                    width: 'resolve'
-                });
-            }
-        }
-
-        function updateFilteredPackingListTable(selectedChungTu) {
-            console.log("Updating filtered packing list table for:", selectedChungTu);
-
-            const filteredPackingListBody = document.getElementById('filteredPackingListBody');
-            const tableHeader = document.querySelector('#filteredPackingListTable thead tr');
-
-            if (!filteredPackingListBody || !tableHeader) {
-                console.error("Required elements not found");
-                return;
-            }
-
-            // Cập nhật headers
-            const headers = packingListData[0];
-            tableHeader.innerHTML = headers.map(header => `<th>${header}</th>`).join('') + '<th>Action</th>';
-
-            // Xóa các hàng cũ
-            filteredPackingListBody.innerHTML = '';
-
-            if (!selectedChungTu) {
-                console.log("No Chứng từ selected, table cleared");
-                return;
-            }
-
-            // Lọc dữ liệu Packing List dựa trên Chứng từ đi kèm được chọn
-            const filteredData = packingListData.slice(1).filter(item => item[7] === selectedChungTu);
-            console.log("Filtered data:", filteredData);
-
-            // Thêm các hàng mới
-            filteredData.forEach((item, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = item.map((cell, cellIndex) => {
-                    // Kiểm tra nếu đây là cột ngày tháng (giả sử là cột thứ 3, index 2)
-                    if (cellIndex === 2) {
-                        return `<td>${formatDate(cell)}</td>`;
-                    }
-                    return `<td>${cell}</td>`;
-                }).join('') +
-                    `<td><button type="button" onclick="removeFilteredPackingListRow(${index})">Xóa</button></td>`;
-                filteredPackingListBody.appendChild(row);
-            });
-
-            console.log("Rows added:", filteredPackingListBody.children.length);
-        }
-
-        function removeFilteredPackingListRow(index) {
-            const filteredPackingListBody = document.getElementById('filteredPackingListBody');
-            if (filteredPackingListBody && filteredPackingListBody.children[index]) {
-                filteredPackingListBody.children[index].remove();
-            }
-        }
-        function addPackingListRow() {
-            const chungTu = document.getElementById('chungTuSelect').value;
-            if (!chungTu) {
-                alert('Vui lòng chọn Chứng từ đi kèm');
-                return;
-            }
-
-            const maKienOptions = packingListData
-                .filter(item => item[7] === chungTu)
-                .map(item => item[11]);
-
-            const row = document.createElement('tr');
-            row.innerHTML = `
-        <td>${chungTu}</td>
-        <td>
-            <select name="Mã kiện (NB)">
-                <option value="">Select Mã kiện</option>
-                ${maKienOptions.map(item => `<option value="${item}">${item}</option>`).join('')}
-            </select>
-        </td>
-        <td><button type="button" onclick="removePackingListRow(this)">Xóa</button></td>
-    `;
-
-            document.getElementById('packingListBody').appendChild(row);
-            selectedPackingList.push({ chungTu, maKien: '' });
-
-            row.querySelector('select').addEventListener('change', function () {
-                const index = Array.from(this.closest('tbody').children).indexOf(this.closest('tr'));
-                selectedPackingList[index].maKien = this.value;
-            });
-        }
-        function updatePackingListTable(selectedChungTu) {
-            const packingListBody = document.getElementById('packingListBody');
-            if (!packingListBody) {
-                console.error("Element with id 'packingListBody' not found");
-                return;
-            }
-
-            // Lọc dữ liệu Packing List dựa trên Chứng từ đi kèm được chọn
-            const filteredData = packingListData.filter(item => item[7] === selectedChungTu);
-
-            // Xóa các hàng cũ
-            packingListBody.innerHTML = '';
-
-            // Thêm các hàng mới
-            filteredData.forEach(item => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-            <td>${item[7]}</td>
-            <td>${item[11]}</td>
-            <td><button type="button" onclick="removePackingListRow(this)">Xóa</button></td>
-        `;
-                packingListBody.appendChild(row);
-            });
-
-            // Cập nhật selectedPackingList
-            selectedPackingList = filteredData.map(item => ({
-                chungTu: item[7],
-                maKien: item[11]
-            }));
-        }
-        function removePackingListRow(button) {
-            const row = button.closest('tr');
-            const index = Array.from(row.parentNode.children).indexOf(row);
-            selectedPackingList.splice(index, 1);
-            row.remove();
-        }
-
-        function addPNKRow() {
-            const rowsContainer = document.getElementById('pnkRowsContainer');
-            const newRow = document.createElement('div');
-            newRow.className = 'pnkRow';
-
-            const table = document.createElement('table');
-            const tr = document.createElement('tr');
-
-            const td1 = document.createElement('td');
-            const chungTuSelect = document.createElement('select');
-            chungTuSelect.name = 'Chứng từ đi kèm';
-            chungTuSelect.innerHTML = '<option value="">Select Chứng từ</option>' +
-                [...new Set(packingListData.slice(1).map(item => item[7]))]
-                    .map(item => `<option value="${item}">${item}</option>`)
-                    .join('');
-            td1.appendChild(chungTuSelect);
-
-            const td2 = document.createElement('td');
-            const maKienSelect = document.createElement('select');
-            maKienSelect.name = 'Mã kiện (NB)';
-            maKienSelect.innerHTML = '<option value="">Select Mã kiện</option>';
-            td2.appendChild(maKienSelect);
-
-            tr.appendChild(td1);
-            tr.appendChild(td2);
-            table.appendChild(tr);
-            newRow.appendChild(table);
-
-            rowsContainer.appendChild(newRow);
-
-            setupRowListeners(newRow);
-        }
-        function setupRowListeners(row) {
-            const chungTuSelect = row.querySelector('select[name="Chứng từ đi kèm"]');
-            const maKienSelect = row.querySelector('select[name="Mã kiện (NB)"]');
-
-            chungTuSelect.addEventListener('change', updateMaKienOptions);
-            maKienSelect.addEventListener('change', function () {
-                console.log("Mã kiện changed:", this.value);
-            });
-
-            chungTuSelect.addEventListener('focusout', logSelectValues);
-            maKienSelect.addEventListener('focusout', logSelectValues);
-        }
-
-        function logSelectValues() {
-            const row = this.closest('.pnkRow');
-            const chungTuValue = row.querySelector('select[name="Chứng từ đi kèm"]').value;
-            const maKienValue = row.querySelector('select[name="Mã kiện (NB)"]').value;
-            console.log("Current values - Chứng từ:", chungTuValue, "Mã kiện:", maKienValue);
-        }
-        function updateMaKienOptions(e) {
-            const selectedChungTu = e.target.value;
-            const pnkRow = e.target.closest('.pnkRow');
-            const maKienNBSelect = pnkRow.querySelector('select[name="Mã kiện (NB)"]');
-
-            if (maKienNBSelect) {
-                const correspondingMaKiens = packingListData
-                    .filter(item => item[7] === selectedChungTu)
-                    .map(item => item[11]);
-
-                maKienNBSelect.innerHTML = '<option value="">Select Mã kiện</option>' +
-                    correspondingMaKiens.map(item => `<option value="${item}">${item}</option>`).join('');
-
-                // Không trigger change event tự động
-                console.log("Mã kiện options updated for:", selectedChungTu);
-            }
-        }
-
-        let pnkRows = [];
-
-        async function addOrUpdatePNK() {
-            const commonInputs = document.querySelectorAll('#pnkCommonInputs input');
-            const commonData = {};
-            commonInputs.forEach(input => {
-                commonData[input.name] = input.value;
-            });
-
-            const chungTuSelect = document.getElementById('chungTuSelect');
-            const selectedChungTu = chungTuSelect ? chungTuSelect.value : '';
-            commonData['Chứng từ đi kèm'] = selectedChungTu;
-
-            const filteredPackingListRows = document.querySelectorAll('#filteredPackingListBody tr');
-            const pnkRows = Array.from(filteredPackingListRows).map(row => {
-                const rowData = { ...commonData };
-                const maKienNB = row.querySelector('td:nth-child(12)').textContent;
-                rowData['Mã kiện (NB)'] = maKienNB;
-                return rowData;
-            });
-
-            console.log("All data to be sent:", pnkRows);
-
-            showLoading(true);
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-
-                    body: JSON.stringify({
-                        action: 'addPNK',
-                        data: pnkRows
-                    })
-                });
-                const result = await response.text();
-                console.log("Add/Update result:", result);
-
-                if (result.includes("rows added successfully")) {
-                    for (let rowData of pnkRows) {
-                        const newRowData = Object.values(rowData);
-                        pnkTable.row.add(newRowData).draw(false);
-                    }
-                }
-
-                await refreshPNKData();
-                renderPNKTable();
-                clearPNKForm();
+                const packingListResponse = await fetch('https://script.google.com/macros/s/AKfycbx4cpvJhB21RYDPWWJP65ecAdx1vB05oF7-ZK7pRLK4fgofV5-LcRQwyUS-wa-M99w3/exec?action=getPackingList');
+                packingListData = await packingListResponse.json();
+
+                const pnkResponse = await fetch('https://script.google.com/macros/s/AKfycbx4cpvJhB21RYDPWWJP65ecAdx1vB05oF7-ZK7pRLK4fgofV5-LcRQwyUS-wa-M99w3/exec?action=getPNK');
+                pnkData = await pnkResponse.json();
+
+                initializePackingListTable();
+                initializePNKForm();
+                initializePNKTable();
             } catch (error) {
-                console.error("Error adding/updating PNK:", error);
-                alert(`Error: ${error.message}`);
-            } finally {
-                showLoading(false);
+                console.error('Error fetching data:', error);
             }
         }
 
-        async function refreshPNKData() {
-            const pnkResponse = await fetch(`${API_URL}?action=getPNK`);
-            const pnkText = await pnkResponse.text();
-            pnkData = JSON.parse(pnkText);
+        function initializePackingListTable() {
+            $('#packingListTable').DataTable({
+                data: packingListData.slice(1),
+                columns: packingListData[0].map(header => ({ title: header }))
+            });
         }
-        function clearPNKForm() {
-            const commonInputs = document.querySelectorAll('#pnkCommonInputs input, #pnkCommonInputs select');
-            commonInputs.forEach(input => {
-                if (input.type !== 'hidden') {
-                    input.value = '';
-                }
+
+        function initializePNKForm() {
+            const invoices = [...new Set(packingListData.slice(1).map(row => row[7]))];
+            const select = document.getElementById('chungTuDiKem');
+            invoices.forEach(invoice => {
+                const option = document.createElement('option');
+                option.value = option.textContent = invoice;
+                select.appendChild(option);
             });
 
-            document.getElementById('editingRowId').value = '';
-
-            const chungTuSelect = document.getElementById('chungTuSelect');
-            if (chungTuSelect) {
-                chungTuSelect.value = '';
-                $(chungTuSelect).trigger('change'); // Nếu bạn đang sử dụng Select2
-            }
-
-            const filteredPackingListBody = document.getElementById('filteredPackingListBody');
-            if (filteredPackingListBody) {
-                filteredPackingListBody.innerHTML = '';
-            }
-
-            document.getElementById('addPNKButton').style.display = 'inline-block';
-            document.getElementById('updatePNKButton').style.display = 'none';
-        }
-        function logFormData() {
-            const form = document.getElementById('pnkForm');
-            const formData = new FormData(form);
-            console.log("Form data before submission:");
-            for (let [key, value] of formData.entries()) {
-                console.log(key, value);
-            }
+            select.addEventListener('change', updateSelectedPackingList);
+            document.getElementById('pnkForm').addEventListener('submit', handlePNKSubmit);
         }
 
-
-        function editPNK(rowIndex) {
-            const rowData = pnkTable.row(rowIndex - 2).data();
-            const form = document.getElementById('pnkForm');
-            const inputs = form.querySelectorAll('input, select');
-
-            // Xóa tất cả các hàng hiện có trong bảng filteredPackingList
-            const filteredPackingListBody = document.getElementById('filteredPackingListBody');
-            filteredPackingListBody.innerHTML = '';
-
-            // Điền thông tin vào form
-            inputs.forEach((input, index) => {
-                if (input.type !== 'submit' && input.type !== 'button') {
-                    if (input.name === 'Ngày tháng') {
-                        // Kiểm tra xem giá trị có phải là chuỗi và có đúng định dạng không
-                        if (typeof rowData[index] === 'string' && rowData[index].includes('/')) {
-                            try {
-                                const [day, month, year] = rowData[index].split('/');
-                                input.value = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-                            } catch (error) {
-                                console.error('Error parsing date:', error);
-                                input.value = ''; // Nếu có lỗi, để trống trường này
-                            }
-                        } else if (rowData[index] instanceof Date) {
-                            // Nếu giá trị là đối tượng Date
-                            input.value = rowData[index].toISOString().split('T')[0];
-                        } else {
-                            console.warn('Unexpected date format:', rowData[index]);
-                            input.value = ''; // Nếu không phải chuỗi hoặc Date, để trống trường này
+        function updateSelectedPackingList() {
+            const selectedInvoice = document.getElementById('chungTuDiKem').value;
+            const filteredData = packingListData.slice(1).filter(row => row[7] === selectedInvoice);
+            $('#selectedPackingListTable').DataTable({
+                data: filteredData,
+                columns: packingListData[0].map(header => ({ title: header })).concat([
+                    {
+                        title: 'Chọn',
+                        render: function (data, type, row) {
+                            return '<input type="checkbox" value="' + row[11] + '">';
                         }
-                    } else {
-                        input.value = rowData[index] || '';
                     }
-                }
+                ]),
+                destroy: true
             });
-
-            // Thêm một hàng mới vào bảng filteredPackingList với Mã kiện (NB)
-            const newRow = document.createElement('tr');
-            newRow.innerHTML = rowData.map((cell, index) => {
-                if (pnkData[0][index] === 'Mã kiện (NB)') {
-                    return `<td>${cell}</td>`;
-                }
-                return '<td></td>';
-            }).join('') + '<td></td>'; // Cột cuối cùng cho nút xóa (trống trong trường hợp này)
-            filteredPackingListBody.appendChild(newRow);
-
-            // Hiển thị nút cập nhật và ẩn nút thêm mới
-            document.getElementById('addPNKButton').style.display = 'none';
-            document.getElementById('updatePNKButton').style.display = 'inline-block';
-
-            // Lưu ID của dòng đang chỉnh sửa
-            document.getElementById('editingRowId').value = rowIndex;
-
-            console.log("Editing row:", rowData);
         }
 
-        async function deletePNK(rowIndex) {
-            // Kiểm tra xem rowIndex có phải là dòng tiêu đề hoặc dòng đầu tiên không
-            if (rowIndex <= 2) {
-                alert('Không thể xóa dòng tiêu đề hoặc dòng đầu tiên!');
-                return;
+        function handlePNKSubmit(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const selectedMaKiens = Array.from(document.querySelectorAll('#selectedPackingListTable input[type="checkbox"]:checked'))
+                .map(checkbox => checkbox.value);
+
+            const newPNKData = selectedMaKiens.map(maKien => [
+                formData.get('nghiepVu'),
+                formData.get('soPhieu'),
+                formData.get('ngayThang'),
+                formData.get('tuDau'),
+                formData.get('denDau'),
+                formData.get('dienGiai'),
+                formData.get('chungTuDiKem'),
+                maKien
+            ]);
+
+            tempPNKData = tempPNKData.concat(newPNKData);
+            updatePNKTable();
+            document.getElementById('saveButton').style.display = 'block';
+        }
+
+        function updatePNKTable() {
+            const table = $('#pnkTable').DataTable();
+            table.clear();
+            table.rows.add(pnkData.concat(tempPNKData));
+            table.draw();
+        }
+
+        async function savePNKData() {
+            try {
+                const dataToSend = {
+                    action: 'addPNK',
+                    data: tempPNKData.map(row => ({
+                        'Nghiệp vụ': row[0],
+                        'Số phiếu': row[1],
+                        'Ngày tháng': row[2],
+                        'Từ đâu': row[3],
+                        'Đến đâu': row[4],
+                        'Diễn giải': row[5],
+                        'Chứng từ đi kèm': row[6],
+                        'Mã kiện (NB)': row[7]
+                    }))
+                };
+
+                const response = await fetch('https://script.google.com/macros/s/AKfycbx4cpvJhB21RYDPWWJP65ecAdx1vB05oF7-ZK7pRLK4fgofV5-LcRQwyUS-wa-M99w3/exec', {
+                    method: 'POST',
+                    body: JSON.stringify(dataToSend)
+                });
+
+                const responseText = await response.text();
+
+                if (response.ok) {
+                    const result = JSON.parse(responseText);
+                    pnkData = pnkData.concat(tempPNKData);
+                    tempPNKData = [];
+                    updatePNKTable();
+                    document.getElementById('saveButton').style.display = 'none';
+                } else {
+                    throw new Error('Network response was not ok');
+                }
+            } catch (error) {
+                console.error('Error saving PNK data:', error);
+                alert('Đã xảy ra lỗi khi lưu dữ liệu: ' + error.message);
             }
+        }
 
-            if (confirm('Bạn có chắc chắn muốn xóa dòng này không?')) {
-                showLoading(true);
-                try {
-                    const response = await fetch(API_URL, {
-                        method: 'POST',
-                        body: JSON.stringify({ action: 'deletePNK', row: rowIndex })
-                    });
-                    const result = await response.text();
-                    console.log("Kết quả xóa:", result);
+        function initializePNKTable() {
+            $('#pnkTable').DataTable({
+                data: pnkData,
+                columns: [
+                    { data: 0, title: "Nghiệp vụ" },
+                    { data: 1, title: "Số phiếu" },
+                    { data: 2, title: "Ngày tháng" },
+                    { data: 3, title: "Từ đâu" },
+                    { data: 4, title: "Đến đâu" },
+                    { data: 5, title: "Diễn giải" },
+                    { data: 6, title: "Chứng từ đi kèm" },
+                    { data: 7, title: "Mã kiện (NB)" },
+                    
+                ]
+            });
+        }
 
-                    // Làm mới dữ liệu PNK
-                    await refreshPNKData();
-                    renderPNKTable();
-                } catch (error) {
-                    console.error("Lỗi khi xóa PNK:", error);
-                    alert(`Lỗi: ${error.message}`);
-                } finally {
-                    showLoading(false);
+        function deletePNKRow(rowIndex) {
+            if (confirm("Bạn có chắc chắn muốn xóa dòng này?")) {
+                const table = $('#pnkTable').DataTable();
+                const rowData = table.row(rowIndex).data();
+                const rowToDelete = pnkData.findIndex(row => row.every((value, index) => value === rowData[index]));
+
+                if (rowToDelete !== -1) {
+                    deletePNK(rowToDelete + 2) // +2 vì hàng đầu tiên là tiêu đề và chỉ số bắt đầu từ 1 trong Google Sheets
+                        .then(() => {
+                            pnkData.splice(rowToDelete, 1);
+                            table.row(rowIndex).remove().draw();
+                        })
+                        .catch(error => {
+                            console.error('Error deleting PNK row:', error);
+                            alert('Đã xảy ra lỗi khi xóa dòng: ' + error.message);
+                        });
                 }
             }
         }
+
+        async function deletePNK(row) {
+            try {
+                const response = await fetch('https://script.google.com/macros/s/AKfycbx4cpvJhB21RYDPWWJP65ecAdx1vB05oF7-ZK7pRLK4fgofV5-LcRQwyUS-wa-M99w3/exec', {
+                    method: 'POST',
+                  
+                    body: `action=deletePNK&row=${row}`
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const result = await response.json();
+                console.log(result.message);
+            } catch (error) {
+                console.error('Error deleting PNK row:', error);
+                throw error; // Re-throw the error so it can be caught in deletePNKRow
+            }
+        }
+
+        fetchData();
+        showTab('packingList');
     </script>
 </body>
 
