@@ -614,9 +614,18 @@
         }
 
         async function addPNK() {
-            const pnkData = getPNKFormData();
-            // Thực hiện logic thêm mới PNK
-            await sendPNKData('add', pnkData);
+            try {
+                const pnkData = getPNKFormData();
+                if (!validatePNKData(pnkData)) {
+                    alert('Vui lòng điền đầy đủ thông tin cần thiết.');
+                    return;
+                }
+                console.log('PNK data before sending:', pnkData);
+                await sendPNKData('add', [pnkData]); // Đặt pnkData trong một mảng
+            } catch (error) {
+                console.error('Error in addPNK:', error);
+                alert(`Lỗi khi thêm PNK: ${error.message}`);
+            }
         }
         async function addPNK() {
             const pnkData = getPNKFormData();
@@ -672,6 +681,9 @@
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
                     body: JSON.stringify({
                         action: action === 'add' ? 'addPNK' : 'updatePNK',
                         data: data
@@ -686,7 +698,7 @@
                     renderPNKTable();
                     clearPNKForm();
                 } else {
-                    throw new Error(`${action === 'add' ? 'Thêm' : 'Cập nhật'} PNK thất bại`);
+                    throw new Error(`${action === 'add' ? 'Thêm' : 'Cập nhật'} PNK thất bại: ${result}`);
                 }
             } catch (error) {
                 console.error(`Error ${action}ing PNK:`, error);
