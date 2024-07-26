@@ -11,7 +11,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <style>
         body {
-            padding-top: 60px;
+            padding-top: 0;
+            /* Loại bỏ padding-top nếu có */
             background-color: #f8f9fa;
         }
 
@@ -55,8 +56,27 @@
             padding-top: 10px;
         }
 
-        .tab-content {
-            padding-top: 20px;
+        .sticky-top {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background-color: #fff;
+            /* Hoặc màu nền khác tùy theo thiết kế của bạn */
+            border-bottom: 1px solid #dee2e6;
+            /* Tạo đường viền phía dưới */
+            padding: 10px 0;
+            /* Thêm padding nếu cần */
+            transition: background-color 0.3s ease;
+        }
+
+        
+
+
+        .sticky-top.scrolled {
+            background-color: rgba(255, 255, 255, 0.9);
+            /* Màu nền với độ trong suốt */
+            backdrop-filter: blur(5px);
+            /* Hiệu ứng làm mờ nền */
         }
     </style>
 </head>
@@ -67,7 +87,7 @@
             <span class="visually-hidden">Đang tải...</span>
         </div>
     </div>
-    <nav>
+    <nav class="sticky-top bg-white">
         <ul class="nav nav-tabs mb-3">
             <li class="nav-item">
                 <a class="nav-link active" data-bs-toggle="tab" href="#packingList">Packing List</a>
@@ -78,7 +98,11 @@
             <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="tab" href="#inventory">Tồn kho</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#userGuide">Hướng dẫn sử dụng</a>
+            </li>
         </ul>
+
     </nav>
     <div class="tab-content mt-4">
         <div class="tab-pane fade show active" id="packingList">
@@ -133,15 +157,15 @@
                                     <select class="form-select" id="nghiepVu" name="nghiepVu"
                                         onchange="updateLocationFields()" required>
                                         <optgroup label="Nhập kho">
-                                            <option value="nhapMuaHang">Nhập mua hàng</option>
-                                            <option value="nhapTraHang">Nhập trả hàng</option>
-                                            <option value="nhapTam">Nhập tạm</option>
-                                            <option value="nhapChuyenKho">Nhập chuyển kho</option>
+                                            <option value="Nhập Mua Hàng">Nhập mua hàng</option>
+                                            <option value="Nhập Trả Hàng">Nhập trả hàng</option>
+                                            <option value="Nhập Tạm">Nhập tạm</option>
+                                            <option value="Nhập Chuển Kho">Nhập chuyển kho</option>
                                         </optgroup>
                                         <optgroup label="Xuất kho">
-                                            <option value="xuatBan">Xuất bán</option>
-                                            <option value="xuatTam">Xuất tạm</option>
-                                            <option value="xuatChuyenKho">Xuất chuyển kho</option>
+                                            <option value="Xuất Bán">Xuất bán</option>
+                                            <option value="Xuất Tạm">Xuất tạm</option>
+                                            <option value="Xuất Chuyển Kho">Xuất chuyển kho</option>
                                         </optgroup>
                                     </select>
                                 </div>
@@ -215,18 +239,6 @@
                     <button id="saveButton" onclick="savePNKData()" class="btn btn-success mb-2">Lưu dữ liệu PNK vào
                         database</button>
                     <table id="pnkTable" class="table table-bordered" style="width: 100%;">
-                        <thead>
-                            <tr>
-                                <th>Nghiệp vụ</th>
-                                <th>Số phiếu</th>
-                                <th>Ngày tháng</th>
-                                <th>Từ đâu</th>
-                                <th>Đến đâu</th>
-                                <th>Diễn giải</th>
-                                <th>Chứng từ đi kèm</th>
-                                <th>Mã kiện (NB)</th>
-                            </tr>
-                        </thead>
                         <tbody></tbody>
                     </table>
                 </div>
@@ -255,7 +267,41 @@
                 </div>
             </div>
         </div>
+        <div class="tab-pane fade" id="userGuide">
+            <div class="card">
+                <div class="card-header bg-warning text-white">
+                    <h2><i class="fas fa-book"></i> Hướng dẫn sử dụng</h2>
+                </div>
+                <div class="card-body">
+                    <h3>1. Tab Packing List</h3>
+                    <p>Hiển thị danh sách Packing List. Bạn có thể xem và tìm kiếm thông tin về các kiện hàng.</p>
 
+                    <h3>2. Tab PNK (Phiếu Nhập Kho)</h3>
+                    <p>Cho phép bạn tạo và quản lý các phiếu nhập kho:</p>
+                    <ul>
+                        <li>Chọn loại nghiệp vụ, điền thông tin phiếu.</li>
+                        <li>Chọn chứng từ đi kèm (Invoice) để lọc danh sách Packing List.</li>
+                        <li>Chọn các kiện hàng cần nhập kho.</li>
+                        <li>Nhấn "Thêm mới" để tạo phiếu nhập kho mới.</li>
+                        <li>Nhấn "Lưu dữ liệu PNK vào database" để lưu các phiếu đã tạo.</li>
+                    </ul>
+
+                    <h3>3. Tab Tồn kho</h3>
+                    <p>Hiển thị thông tin tồn kho kết hợp từ Packing List và PNK:</p>
+                    <ul>
+                        <li>Sử dụng các bộ lọc để tìm kiếm theo Tên Gỗ hoặc Mã Kiện.</li>
+                        <li>Xem thông tin chi tiết về từng kiện hàng và trạng thái tồn kho.</li>
+                    </ul>
+
+                    <h3>Lưu ý chung:</h3>
+                    <ul>
+                        <li>Đảm bảo kết nối internet ổn định để tải và lưu dữ liệu.</li>
+                        <li>Kiểm tra kỹ thông tin trước khi thêm mới hoặc lưu dữ liệu.</li>
+                        <li>Nếu gặp lỗi, hãy làm mới trang và thử lại.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -313,53 +359,94 @@
             // Khởi tạo các trường kho
             updateLocationFields();
         });
+        document.getElementById('tuDau').addEventListener('change', updateSoPhieu);
+        document.getElementById('denDau').addEventListener('change', updateSoPhieu);
+        function updateSoPhieu() {
+            const nghiepVu = document.getElementById('nghiepVu').value;
+            const tuKho = document.getElementById('tuDau').value;
+            const denKho = document.getElementById('denDau').value;
+            const soPhieuInput = document.getElementById('soPhieu');
 
+            const soPhieu = generateSoPhieu(nghiepVu, tuKho, denKho);
+            soPhieuInput.value = soPhieu;
+        }
+        function generateSoPhieu(nghiepVu, tuDau, denDau) {
+            const prefixMap = {
+                'Nhập Mua Hàng': 'NMH',
+                'Nhập Trả Hàng': 'NTH',
+                'Nhập Tạm': 'NTA',
+                'Nhập Chuển Kho': 'NCK',
+                'Xuất Bán': 'XBA',
+                'Xuất Tạm': 'XTA',
+                'Xuất Chuyển Kho': 'XCK'
+            };
+
+            const locationMap = {
+                'Kho Nhà Cung Cấp': 'NC',
+                'Kho An Phú': 'AP',
+                'Kho Hoàng Lâm': 'HL',
+                'Kho Khách Hàng': 'KH'
+            };
+
+            const prefix = prefixMap[nghiepVu] || 'XXX';
+            const from = locationMap[tuDau] || 'XX';
+            const to = locationMap[denDau] || 'XX';
+            const date = new Date();
+            const dateStr = `${date.getDate().toString().padStart(2, '0')}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getFullYear().toString().slice(-2)}`;
+
+            // Số thứ tự, bạn cần lưu trữ và tăng dần số này cho mỗi phiếu
+            const serialNumber = '001'; // Giả sử đây là số thứ tự
+
+            return `${prefix}-${from}-${to}-${dateStr}-${serialNumber}`;
+        }
         function updateLocationFields() {
             const nghiepVu = document.getElementById('nghiepVu').value;
             const tuKho = document.getElementById('tuDau');
             const denKho = document.getElementById('denDau');
-
+            const soPhieuInput = document.getElementById('soPhieu');
             // Xóa các option hiện tại
             tuKho.innerHTML = '';
             denKho.innerHTML = '';
 
             // Thêm các option mới dựa trên loại nghiệp vụ
             switch (nghiepVu) {
-                case 'nhapMuaHang':
-                    addOption(tuKho, 'Kho NCC', 'khoNCC');
-                    addOption(denKho, 'Kho An Phú', 'khoAnPhu', true);
-                    addOption(denKho, 'Kho Hoàng Lâm', 'khoHoangLam');
+                case 'Nhập Mua Hàng':
+                    addOption(tuKho, 'Kho Nhà Cung Cấp', 'Kho Nhà Cung Cấp');
+                    addOption(denKho, 'Kho An Phú', 'Kho An Phú', true);
+                    addOption(denKho, 'Kho Hoàng Lâm', 'Kho Hoàng Lâm');
                     break;
-                case 'nhapTraHang':
-                    addOption(tuKho, 'Kho khách hàng', 'khoKhachHang');
-                    addOption(denKho, 'Kho An Phú', 'khoAnPhu', true);
-                    addOption(denKho, 'Kho Hoàng Lâm', 'khoHoangLam');
+                case 'Nhập Trả Hàng':
+                    addOption(tuKho, 'Kho khách hàng', 'Kho Khách Hàng');
+                    addOption(denKho, 'Kho An Phú', 'Kho An Phú', true);
+                    addOption(denKho, 'Kho Hoàng Lâm', 'Kho Hoàng Lâm');
                     break;
-                case 'nhapTam':
-                    addOption(tuKho, 'Kho NCC', 'khoNCC');
-                    addOption(denKho, 'Kho An Phú', 'khoAnPhu', true);
-                    addOption(denKho, 'Kho Hoàng Lâm', 'khoHoangLam');
+                case 'Nhập Tạm':
+                    addOption(tuKho, 'Kho Nhà Cung Cấp', 'Kho Nhà Cung Cấp');
+                    addOption(denKho, 'Kho An Phú', 'Kho An Phú', true);
+                    addOption(denKho, 'Kho Hoàng Lâm', 'Kho Hoàng Lâm');
                     break;
-                case 'nhapChuyenKho':
-                    addOption(tuKho, 'Kho Hoàng Lâm', 'khoHoangLam', true);
-                    addOption(tuKho, 'Kho An Phú', 'khoAnPhu');
-                    addOption(denKho, 'Kho An Phú', 'khoAnPhu', true);
-                    addOption(denKho, 'Kho Hoàng Lâm', 'khoHoangLam');
+                case 'Nhập Chuển Kho':
+                    addOption(tuKho, 'Kho Hoàng Lâm', 'Kho Hoàng Lâm', true);
+                    addOption(tuKho, 'Kho An Phú', 'Kho An Phú');
+                    addOption(denKho, 'Kho An Phú', 'Kho An Phú', true);
+                    addOption(denKho, 'Kho Hoàng Lâm', 'Kho Hoàng Lâm');
                     break;
-                case 'xuatBan':
-                case 'xuatTam':
-                    addOption(tuKho, 'Kho An Phú', 'khoAnPhu', true);
-                    addOption(tuKho, 'Kho Hoàng Lâm', 'khoHoangLam');
-                    addOption(denKho, nghiepVu === 'xuatBan' ? 'Kho khách hàng' : 'Kho NCC',
-                        nghiepVu === 'xuatBan' ? 'khoKhachHang' : 'khoNCC');
+                case 'Xuất Bán':
+                case 'Xuất Tạm':
+                    addOption(tuKho, 'Kho An Phú', 'Kho An Phú', true);
+                    addOption(tuKho, 'Kho Hoàng Lâm', 'Kho Hoàng Lâm');
+                    addOption(denKho, nghiepVu === 'Xuất Bán' ? 'Kho khách hàng' : 'Kho Nhà Cung Cấp',
+                        nghiepVu === 'Xuất Bán' ? 'Kho Khách Hàng' : 'Kho Nhà Cung Cấp');
                     break;
-                case 'xuatChuyenKho':
-                    addOption(tuKho, 'Kho An Phú', 'khoAnPhu', true);
-                    addOption(tuKho, 'Kho Hoàng Lâm', 'khoHoangLam');
-                    addOption(denKho, 'Kho Hoàng Lâm', 'khoHoangLam', true);
-                    addOption(denKho, 'Kho An Phú', 'khoAnPhu');
+                case 'Xuất Chuyển Kho':
+                    addOption(tuKho, 'Kho An Phú', 'Kho An Phú', true);
+                    addOption(tuKho, 'Kho Hoàng Lâm', 'Kho Hoàng Lâm');
+                    addOption(denKho, 'Kho Hoàng Lâm', 'Kho Hoàng Lâm', true);
+                    addOption(denKho, 'Kho An Phú', 'Kho An Phú');
                     break;
             }
+            const soPhieu = generateSoPhieu(nghiepVu, tuKho.value, denKho.value);
+            soPhieuInput.value = soPhieu;
         }
 
         function addOption(selectElement, text, value, selected = false) {
@@ -465,18 +552,10 @@
 
         function initializePNKTable() {
             $('#pnkTable').DataTable({
-                data: pnkData,
-                columns: [
-                    { data: 0, title: "Nghiệp vụ" },
-                    { data: 1, title: "Số phiếu" },
-                    { data: 2, title: "Ngày tháng" },
-                    { data: 3, title: "Từ đâu" },
-                    { data: 4, title: "Đến đâu" },
-                    { data: 5, title: "Diễn giải" },
-                    { data: 6, title: "Chứng từ đi kèm" },
-                    { data: 7, title: "Mã kiện (NB)" },
-
-                ]
+                data: pnkData.slice(1), // Bỏ qua phần tử đầu tiên (tiêu đề)
+                columns: pnkData[0].map(header => ({ title: header })), // Sử dụng phần tử đầu tiên làm tiêu đề
+                ordering: true,
+                searching: true
             });
         }
 
@@ -704,7 +783,14 @@
                 });
             });
         });
-
+        window.addEventListener('scroll', function () {
+            var nav = document.querySelector('.sticky-top');
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
         fetchData();
         showTab('packingList');
     </script>
