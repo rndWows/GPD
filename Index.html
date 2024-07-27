@@ -469,7 +469,7 @@
                 });
                 if (response.ok) {
                     const result = await response.json();
-                    pnkData = pnkData.concat(tempPNKData);
+                    pnkData = pnkData.concat(tempPNKData);       
                     tempPNKData = [];
                     updatePNKTable();
                     document.getElementById('saveButton').style.display = 'none';
