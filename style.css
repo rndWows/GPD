@@ -1,0 +1,212 @@
+@media only screen and (max-width: 1023px) {}
+
+
+@media only screen and (max-width: 739px) {}
+
+
+@media only screen and (min-width: 740px) and (max-width: 1023px) {}
+
+
+@media (min-width: 1024px) and (max-width: 1239px) {}
+
+@media only screen and (min-width: 1024px) {}
+
+body {
+    padding-top: 0;
+    /* Loại bỏ padding-top nếu có */
+    background-color: #f8f9fa;
+}
+
+/* Reset css */
+* {
+    box-sizing: border-box;
+}
+
+ul,
+li {
+    list-style: none;
+    list-style-type: none;
+}
+
+ul {
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+}
+
+/* End reset css */
+/* ********************** Table wrap ********************** */
+.table-wrap {
+    color: #333;
+    font-size: 14px;
+}
+
+/* ********************** End table wrap ********************** */
+/* ********************** Table common ********************** */
+table {
+    width: 100%;
+    overflow: hidden;
+    border-radius: 4px;
+    box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.15), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+}
+
+table .pcs::after {
+    content: " pcs";
+}
+
+table .cur::before {
+    content: "$";
+}
+
+table .per::after {
+    content: "%";
+}
+
+table thead th {
+    text-align: left;
+    padding-block: 8px;
+    border-top: 1px solid #f0f0f0;
+    border-bottom: 1px solid #ececec;
+}
+
+table tbody tr:not(:last-child) td {
+    border-bottom: 1px solid #ececec;
+}
+
+table th,
+table td {
+    padding: 16px;
+}
+
+table td {
+    vertical-align: middle;
+}
+
+#loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+.card {
+    margin-bottom: 20px;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.nav-link {
+    color: #495057;
+}
+
+.nav-link.active {
+    font-weight: bold;
+    color: #007bff;
+}
+
+.nav-tabs {
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+    z-index: 1000;
+    padding-top: 10px;
+}
+
+.sticky-top {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: #fff;
+    /* Hoặc màu nền khác tùy theo thiết kế của bạn */
+    border-bottom: 1px solid #dee2e6;
+    /* Tạo đường viền phía dưới */
+    padding: 10px 0;
+    /* Thêm padding nếu cần */
+    transition: background-color 0.3s ease;
+}
+
+.fui-checkbox-toggle {
+    cursor: pointer;
+}
+
+.fui-checkbox-toggle .toggle-input {
+    display: none;
+}
+
+.fui-checkbox-toggle .toggle-input:checked+.toggle-bar {
+    background-color: #1dc071;
+}
+
+.fui-checkbox-toggle .toggle-input:checked+.toggle-bar .toggle-spin {
+    transform: translateX(50px);
+}
+
+.fui-checkbox-toggle .toggle-bar {
+    width: 100px;
+    height: 50px;
+    background-color: #cbd5e1;
+    border-radius: 5rem;
+    padding: 5px;
+    transition: background-color 0.2s linear;
+}
+
+.fui-checkbox-toggle .toggle-spin {
+    width: 40px;
+    height: 40px;
+    border-radius: 100rem;
+    background-color: #fff;
+    transition: transform 0.2s linear;
+}
+
+
+.sticky-top.scrolled {
+    background-color: rgba(255, 255, 255, 0.9);
+    /* Màu nền với độ trong suốt */
+    backdrop-filter: blur(5px);
+    /* Hiệu ứng làm mờ nền */
+}
+
+
+.fui-loading-hourglass {
+    display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 80px;
+  }
+  .fui-loading-hourglass:after {
+    content: " ";
+    display: block;
+    border-radius: 50%;
+    width: 0;
+    height: 0;
+    margin: 8px;
+    box-sizing: border-box;
+    border: 32px solid #1dc071;
+    border-color: #1dc071 rgba(0, 0, 0, 0) #1dc071 rgba(0, 0, 0, 0);
+    animation: JPup5 1.2s infinite;
+  }
+  @keyframes JPup5 {
+    0% {
+      transform: rotate(0);
+      animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+    }
+    50% {
+      transform: rotate(900deg);
+      animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    }
+    100% {
+      transform: rotate(1800deg);
+    }
+  }
