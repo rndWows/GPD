@@ -13,7 +13,7 @@
         href="https://cdn.jsdelivr.net/gh/lelinh014756/fui-toast-js@master/assets/css/toast@1.0.1/fuiToast.min.css">
     <script type="text/javascript"
         src="https://cdn.jsdelivr.net/gh/lelinh014756/fui-toast-js@master/assets/js/toast@1.0.1/fuiToast.min.js"></script>
-        
+
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -230,8 +230,8 @@
                     <table id="inventoryReportTable" class="table table-bordered table-hover">
                         <thead>
                             <tr>
+                                <th></th>
                                 <th>Tên Gỗ</th>
-                                <th>Mã Kiện</th>
                                 <th>Nhập</th>
                                 <th>Xuất</th>
                                 <th>Tồn</th>
@@ -285,19 +285,20 @@
     <script src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap5.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/lelinh014756/fui-toast-js@master/assets/js/toast@1.0.1/fuiToast.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/gh/lelinh014756/fui-toast-js@master/assets/js/toast@1.0.1/fuiToast.min.js"></script>
     <script>
         let packingListData = [], pnkData = [], tempPNKData = [];
         let inventoryTable;
@@ -317,14 +318,23 @@
                     fetch('https://script.google.com/macros/s/AKfycbx4cpvJhB21RYDPWWJP65ecAdx1vB05oF7-ZK7pRLK4fgofV5-LcRQwyUS-wa-M99w3/exec?action=getPackingList'),
                     fetch('https://script.google.com/macros/s/AKfycbx4cpvJhB21RYDPWWJP65ecAdx1vB05oF7-ZK7pRLK4fgofV5-LcRQwyUS-wa-M99w3/exec?action=getPNK')
                 ]);
+
+                if (!packingListResponse.ok || !pnkResponse.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
                 packingListData = await packingListResponse.json();
                 pnkData = await pnkResponse.json();
+
+                console.log('Fetched data:', { packingListData, pnkData }); // Thêm dòng này để kiểm tra dữ liệu
+
                 initializePackingListTable();
                 initializePNKForm();
                 initializePNKTable();
-                FuiToast.success('Tải thành công.')
+                FuiToast.success('Tải thành công.');
             } catch (error) {
-                FuiToast.error('Lỗi tìm nạp dữ liệu.')
+                console.error('Error fetching data:', error);
+                FuiToast.error('Lỗi tìm nạp dữ liệu: ' + error.message);
             } finally {
                 document.getElementById('loading-overlay').style.display = 'none';
             }
@@ -485,62 +495,52 @@
             });
         };
 
-        const initializeInventoryTable = () => {
-            const inventoryData = combinePackingListAndPNK();
-            const columns = [
-                { title: "Nghiệp vụ", data: "nghiepVu" },
-                { title: "Số phiếu", data: "soPhieu" },
-                { title: "Ngày tháng", data: "ngayThang" },
-                { title: "Từ đâu", data: "tuDau" },
-                { title: "Đến đâu", data: "denDau" },
-                { title: "Diễn giải", data: "dienGiai" },
-                { title: "Chứng từ đi kèm", data: "chungTuDiKem" },
-                { title: "Mã kiện (NB)", data: "maKienNB" },
-                { title: "TỜ KHAI", data: "toKhai" },
-                { title: "NGÀY TỜ KHAI", data: "ngayToKhai" },
-                { title: "ĐƠN GIÁ (USD)", data: "donGiaUSD" },
-                { title: "ĐƠN GIÁ (EUR)", data: "donGiaEUR" },
-                { title: "TỶ GIÁ", data: "tyGia" },
-                { title: "FSC", data: "fsc" },
-                { title: "XUẤT XỨ", data: "xuatXu" },
-                { title: "INVOICE", data: "invoice" },
-                { title: "TÊN NHÀ CUNG CẤP", data: "tenNhaCungCap" },
-                { title: "SỐ CONTAINER", data: "soContainer" },
-                { title: "TÊN GỖ", data: "tenGo" },
-                { title: "MÃ KIỆN", data: "maKien" },
-                { title: "KHỐI LƯỢNG THỰC TẾ", data: "khoiLuongThucTe" },
-                { title: "SỐ THANH THỰC TẾ", data: "soThanhThucTe" },
-                { title: "CHIỀU DÀI THỰC TẾ", data: "chieuDaiThucTe" },
-                { title: "CHIỀU RỘNG THỰC TẾ", data: "chieuRongThucTe" },
-                { title: "MÃ KIỆN TRÊN PL", data: "maKienTrenPL" },
-                { title: "Trạng thái kiện", data: "trangThaiKien" }
-            ];
+        function initializeInventoryTable() {
+            if ($.fn.DataTable.isDataTable('#inventoryTable')) {
+                inventoryTable.ajax.reload();
+                return;
+            }
 
-            const table = $('#inventoryTable').DataTable({
+            const inventoryData = combinePackingListAndPNK();
+
+            inventoryTable = $('#inventoryTable').DataTable({
                 data: inventoryData,
-                columns: columns,
+                columns: [
+                    { title: "Nghiệp vụ", data: "nghiepVu" },
+                    { title: "Số phiếu", data: "soPhieu" },
+                    { title: "Ngày tháng", data: "ngayThang" },
+                    { title: "Từ đâu", data: "tuDau" },
+                    { title: "Đến đâu", data: "denDau" },
+                    { title: "Diễn giải", data: "dienGiai" },
+                    { title: "Chứng từ đi kèm", data: "chungTuDiKem" },
+                    { title: "Mã kiện (NB)", data: "maKienNB" },
+                    { title: "TỜ KHAI", data: "toKhai" },
+                    { title: "NGÀY TỜ KHAI", data: "ngayToKhai" },
+                    { title: "ĐƠN GIÁ (USD)", data: "donGiaUSD" },
+                    { title: "ĐƠN GIÁ (EUR)", data: "donGiaEUR" },
+                    { title: "TỶ GIÁ", data: "tyGia" },
+                    { title: "FSC", data: "fsc" },
+                    { title: "XUẤT XỨ", data: "xuatXu" },
+                    { title: "INVOICE", data: "invoice" },
+                    { title: "TÊN NHÀ CUNG CẤP", data: "tenNhaCungCap" },
+                    { title: "SỐ CONTAINER", data: "soContainer" },
+                    { title: "TÊN GỖ", data: "tenGo" },
+                    { title: "MÃ KIỆN", data: "maKien" },
+                    { title: "KHỐI LƯỢNG THỰC TẾ", data: "khoiLuongThucTe" },
+                    { title: "SỐ THANH THỰC TẾ", data: "soThanhThucTe" },
+                    { title: "CHIỀU DÀI THỰC TẾ", data: "chieuDaiThucTe" },
+                    { title: "CHIỀU RỘNG THỰC TẾ", data: "chieuRongThucTe" },
+                    { title: "MÃ KIỆN TRÊN PL", data: "maKienTrenPL" },
+                    { title: "Trạng thái kiện", data: "trangThaiKien" }
+                ],
                 pageLength: 10,
                 lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
-                language: {
-                    lengthMenu: "Hiển thị _MENU_ dòng trên mỗi trang",
-                    zeroRecords: "Không tìm thấy dữ liệu phù hợp",
-                    info: "Hiển thị trang _PAGE_ trên _PAGES_",
-                    infoEmpty: "Không có dữ liệu",
-                    infoFiltered: "(lọc từ _MAX_ dòng)",
-                    search: "Tìm kiếm:",
-                    paginate: {
-                        first: "Đầu",
-                        last: "Cuối",
-                        next: "Tiếp",
-                        previous: "Trước"
-                    }
-                },
                 scrollX: true,
                 scrollY: '50vh',
                 scrollCollapse: true,
                 fixedColumns: { left: 7 },
                 dom: '<"row"<"col-sm-12 col-md-6"B><"col-sm-12 col-md-6"f>>rt<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"p>>',
-             
+                buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
                 responsive: {
                     details: {
                         type: 'column',
@@ -559,26 +559,37 @@
                     }
                 ],
                 order: [[1, 'asc']],
-                deferRender: true
+                deferRender: true,
+                initComplete: function (settings, json) {
+                    updateFilters(inventoryData);
+                }
             });
+        }
 
+        function updateFilters(data) {
             $('#tenGoSearch').select2({
-                data: [...new Set(inventoryData.map(item => item.tenGo))].map(tenGo => ({ id: tenGo, text: tenGo })),
+                data: [...new Set(data.map(item => item.tenGo))].map(tenGo => ({ id: tenGo, text: tenGo })),
                 placeholder: 'Chọn Tên Gỗ',
                 allowClear: true
             }).on('change', function () {
-                table.column(18).search($(this).val()).draw();
+                inventoryTable.column(18).search($(this).val()).draw();
             });
 
             $('#maKienSearch').select2({
-                data: [...new Set(inventoryData.map(item => item.maKien))].map(maKien => ({ id: maKien, text: maKien })),
+                data: [...new Set(data.map(item => item.maKien))].map(maKien => ({ id: maKien, text: maKien })),
                 placeholder: 'Chọn Mã Kiện',
                 allowClear: true
             }).on('change', function () {
-                table.column(19).search($(this).val()).draw();
+                inventoryTable.column(19).search($(this).val()).draw();
             });
-        };
-
+        }
+        $('a[data-bs-toggle="tab"][href="#inventory"]').on('shown.bs.tab', function (e) {
+            document.getElementById('loading-overlay').style.display = 'flex';
+            setTimeout(() => {
+                initializeInventoryTable();
+                document.getElementById('loading-overlay').style.display = 'none';
+            }, 100);
+        });
         const combinePackingListAndPNK = () => {
             const packingListMap = new Map(packingListData.slice(1).map(row => [
                 row[11],
@@ -591,7 +602,7 @@
                 }
             ]));
 
-            return pnkData.reduce((acc, row) => {
+            const result = pnkData.reduce((acc, row) => {
                 const packingListInfo = packingListMap.get(row[7]);
                 if (packingListInfo) {
                     acc.push({
@@ -602,6 +613,9 @@
                 }
                 return acc;
             }, []);
+
+            console.log('Combined data:', result); // Thêm dòng này để kiểm tra dữ liệu
+            return result;
         };
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -656,16 +670,35 @@
             const table = $('#inventoryReportTable').DataTable({
                 data: reportData,
                 columns: [
+                    {
+                        className: 'dt-control',
+                        orderable: false,
+                        data: null,
+                        defaultContent: '',
+                    },
                     { data: 'tenGo' },
-                    { data: 'maKienNB' },
                     { data: 'nhap', render: $.fn.dataTable.render.number(',', '.', 2) },
                     { data: 'xuat', render: $.fn.dataTable.render.number(',', '.', 2) },
                     { data: 'ton', render: $.fn.dataTable.render.number(',', '.', 2) }
                 ],
-                order: [[0, 'asc'], [1, 'asc']],
+                order: [[1, 'asc']],
                 pageLength: 25,
                 dom: 'Bfrtip',
                 buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+            });
+
+            // Xử lý sự kiện click để hiển thị/ẩn chi tiết
+            $('#inventoryReportTable tbody').on('click', 'td.dt-control', function () {
+                var tr = $(this).closest('tr');
+                var row = table.row(tr);
+
+                if (row.child.isShown()) {
+                    row.child.hide();
+                    tr.removeClass('shown');
+                } else {
+                    row.child(format(row.data())).show();
+                    tr.addClass('shown');
+                }
             });
 
             // Xử lý tìm kiếm
@@ -705,30 +738,53 @@
                 }
             );
         }
+        function format(d) {
+            let detailTable = '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">';
+            detailTable += '<tr><th>Mã Kiện</th><th>Nhập</th><th>Xuất</th><th>Tồn</th></tr>';
 
+            d.details.forEach(detail => {
+                detailTable += '<tr>' +
+                    '<td>' + detail.maKienNB + '</td>' +
+                    '<td>' + detail.nhap.toFixed(2) + '</td>' +
+                    '<td>' + detail.xuat.toFixed(2) + '</td>' +
+                    '<td>' + detail.ton.toFixed(2) + '</td>' +
+                    '</tr>';
+            });
+
+            detailTable += '</table>';
+            return detailTable;
+        }
         function processInventoryData(data) {
             const inventory = {};
             const nhapOperations = ['Nhập Mua Hàng', 'Nhập Trả Hàng', 'Nhập Tạm', 'Nhập Chuển Kho'];
             const xuatOperations = ['Xuất Bán', 'Xuất Tạm', 'Xuất Chuyển Kho'];
 
             data.forEach(item => {
-                const key = `${item.tenGo}-${item.maKienNB}`;
-                if (!inventory[key]) {
-                    inventory[key] = { tenGo: item.tenGo, maKienNB: item.maKienNB, nhap: 0, xuat: 0 };
+                if (!inventory[item.tenGo]) {
+                    inventory[item.tenGo] = { tenGo: item.tenGo, nhap: 0, xuat: 0, details: {} };
+                }
+                if (!inventory[item.tenGo].details[item.maKienNB]) {
+                    inventory[item.tenGo].details[item.maKienNB] = { maKienNB: item.maKienNB, nhap: 0, xuat: 0 };
                 }
 
                 const quantity = parseFloat(item.khoiLuongThucTe) || 0;
 
                 if (nhapOperations.includes(item.nghiepVu)) {
-                    inventory[key].nhap += quantity;
+                    inventory[item.tenGo].nhap += quantity;
+                    inventory[item.tenGo].details[item.maKienNB].nhap += quantity;
                 } else if (xuatOperations.includes(item.nghiepVu)) {
-                    inventory[key].xuat += quantity;
+                    inventory[item.tenGo].xuat += quantity;
+                    inventory[item.tenGo].details[item.maKienNB].xuat += quantity;
                 }
             });
 
             return Object.values(inventory).map(item => ({
                 ...item,
-                ton: item.nhap - item.xuat
+                ton: item.nhap - item.xuat,
+                details: Object.values(item.details).map(detail => ({
+                    ...detail,
+                    ton: detail.nhap - detail.xuat
+                }))
             }));
         }
 
