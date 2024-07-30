@@ -42,7 +42,10 @@
                 <button class="nav-link" id="pnk-tab" data-bs-toggle="tab" data-bs-target="#pnk" type="button"
                     role="tab" aria-controls="pnk" aria-selected="false">PNK</button>
             </li>
-
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="inventory-tab" data-bs-toggle="tab" data-bs-target="#inventory"
+                    type="button" role="tab" aria-controls="inventory" aria-selected="false">Báo Cáo Tồn Kho</button>
+            </li>
         </ul>
         <div class="tab-content" id="myTabContent">
 
@@ -173,11 +176,37 @@
                         </table>
 
                         <h3>Danh sách PNK</h3>
-                        <button id="saveButton" onclick="savePNKData()" class="btn btn-success mb-2">Lưu dữ liệu PNK vào
+                        <button id="saveButton" class="btn btn-success mb-2">Lưu dữ liệu PNK vào
                             database</button>
                     </div>
                 </div>
                 <table id="pnk-table" class="fui-table-ui-basic-linh table-wrap" style="width: 100%;"></table>
+            </div>
+            <div class="tab-pane fade" id="inventory" role="tabpanel" aria-labelledby="inventory-tab">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h2>Báo Cáo Tồn Kho</h2>
+                    </div>
+                    <div class="card-body">
+                        <table id="inventoryTable" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>MÃ KIỆN</th>
+                                    <th>TÊN GỖ</th>
+                                    <th>KHỐI LƯỢNG THỰC TẾ</th>
+                                    <th>SỐ THANH THỰC TẾ</th>
+                                    <th>CHIỀU DÀI THỰC TẾ</th>
+                                    <th>CHIỀU RỘNG THỰC TẾ</th>
+                                    <th>KHO HIỆN TẠI</th>
+                                    <th>TRẠNG THÁI</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventoryTableBody">
+                                <!-- Dữ liệu sẽ được điền vào đây bằng JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -268,10 +297,10 @@
                 }
 
                 // Áp dụng định dạng ngày
-                applyDateFormatting();
 
+                applyDateFormatting();
                 displayData();
-                initializePNKForm();
+                updateInventoryReport();
 
                 document.getElementById('loading-overlay').style.display = 'none';
                 document.getElementById('content').style.display = 'block';
@@ -283,86 +312,13 @@
             }
         }
 
-        function initializePNKForm() {
-            console.log('Initializing PNK Form');
-            console.log('sheetData:', sheetData);
-            console.log('sheetData.packingList:', sheetData.packingList);
-            console.log('sheetData.pnkData:', sheetData.pnkData);
-
-            if (Array.isArray(sheetData.packingList) && sheetData.packingList.length > 0) {
-                const invoices = [...new Set(sheetData.packingList.map(row => row.INVOICE).filter(Boolean))];
-                console.log('Unique invoices:', invoices);
-
-                const select = document.getElementById('chungTuDiKem');
-                if (select) {
-                    select.innerHTML = '<option value="">Chọn chứng từ đi kèm</option>';
-                    invoices.forEach(invoice => {
-                        const option = document.createElement('option');
-                        option.value = option.textContent = invoice;
-                        select.appendChild(option);
-                    });
-
-                    $('#chungTuDiKem').select2({
-                        placeholder: 'Chọn chứng từ đi kèm',
-                        allowClear: true
-                    });
-                    $('#chungTuDiKem').on('change', updateSelectedPackingList);
-                } else {
-                    console.error("Element with ID 'chungTuDiKem' not found");
-                }
-            } else {
-                console.warn('sheetData.packingList is not available or empty');
-                // Hiển thị thông báo cho người dùng
-            }
-
-            // ... rest of the function
-        }
         function displayData() {
             displayPackingListTable('packing-list-table', sheetData.packingList);
             displayDHTable('dh-table', sheetData.dh);
             displayBGTable('bg-table', sheetData.bg);
             displayPNKTable('pnk-table', sheetData.pnkData)
         }
-        const handlePNKSubmit = (event) => {
-            event.preventDefault();
 
-            if (confirm('Bạn có chắc chắn muốn thêm mới dữ liệu này?')) {
-                const formData = new FormData(event.target);
-                const selectedMaKiens = Array.from(
-                    document.querySelectorAll('#selectedPackingListTable input[type="checkbox"]:checked'),
-                    checkbox => checkbox.value
-                );
-                const newPNKData = selectedMaKiens.map(maKien => ({
-                    'Loại nghiệp vụ': formData.get('nghiepVu'),
-                    'Số phiếu': formData.get('soPhieu'),
-                    'Ngày tháng': formData.get('ngayThang'),
-                    'Từ kho': formData.get('tuDau'),
-                    'Đến kho': formData.get('denDau'),
-                    'Diễn giải': formData.get('dienGiai'),
-                    'Chứng từ đi kèm': formData.get('chungTuDiKem'),
-                    'Mã kiện': maKien
-                }));
-
-                sheetData.pnk = sheetData.pnk.concat(newPNKData);
-
-                // Cập nhật trạng thái kiện và kho hiện tại trong packingListData
-                sheetData.packingList = sheetData.packingList.map(row => {
-                    if (selectedMaKiens.includes(row['MÃ KIỆN'])) {
-                        const newStatus = calculatePackingStatus(row['MÃ KIỆN']);
-                        const newWarehouse = getCurrentWarehouse(row['MÃ KIỆN']);
-                        return { ...row, 'Trạng thái kiện': newStatus, 'Kho hiện tại': newWarehouse };
-                    }
-                    return row;
-                });
-
-                displayPNKTable('pnk-table', sheetData.pnk);
-                updateSelectedPackingList();
-
-                document.getElementById('saveButton').style.display = 'block';
-
-                FuiToast.success('Đã thêm mới dữ liệu thành công');
-            }
-        };
         function displayPackingListTable(tableId, data) {
             const table = $(`#${tableId}`);
             table.empty();
@@ -600,406 +556,86 @@
                 }
             });
         }
-        function updateNghiepVu() {
-            const loaiPhieuSelect = document.getElementById('loaiPhieu');
-            const nghiepVuSelect = document.getElementById('nghiepVu');
-
-            const nghiepVuOptions = {
-                'Nhập': ['Nhập Mua hàng', 'Nhập trả hàng', 'Nhập tạm', 'Nhập chuyển kho'],
-                'Xuất': ['Xuất bán', 'Xuất tạm', 'Xuất chuyển kho', 'Xuất nhà cung cấp']
-            };
-
-            const selectedLoaiPhieu = loaiPhieuSelect.value;
-            nghiepVuSelect.innerHTML = '<option value="">Chọn nghiệp vụ</option>';
-
-            if (selectedLoaiPhieu in nghiepVuOptions) {
-                nghiepVuOptions[selectedLoaiPhieu].forEach(function (option) {
-                    const optionElement = document.createElement('option');
-                    optionElement.textContent = option;
-                    optionElement.value = option;
-                    nghiepVuSelect.appendChild(optionElement);
-                });
-            }
-
-            updateChungTuDiKem();
-        }
-
-        const updateLocationFields = () => {
-            const nghiepVu = document.getElementById('nghiepVu').value;
-            const tuKho = document.getElementById('tuDau');
-            const denKho = document.getElementById('denDau');
-            const soPhieuInput = document.getElementById('soPhieu');
-            const chungTuDiKem = document.getElementById('chungTuDiKem');
-
-            tuKho.innerHTML = '';
-            denKho.innerHTML = '';
-
-            const khoAnPhu = ['Kho An Phú', 'Kho An Phú'];
-            const khoHoangLam = ['Kho Hoàng Lâm', 'Kho Hoàng Lâm'];
-            const khoNhaCungCap = ['Kho Nhà Cung Cấp', 'Kho Nhà Cung Cấp'];
-            const khoKhachHang = ['Kho Khách Hàng', 'Kho Khách Hàng'];
-
-            const options = {
-                'Nhập Mua Hàng': {
-                    from: [khoNhaCungCap],
-                    to: [khoAnPhu, khoHoangLam]
-                },
-                'Nhập Trả Hàng': {
-                    from: [khoKhachHang],
-                    to: [khoAnPhu, khoHoangLam]
-                },
-                'Nhập Tạm': {
-                    from: [khoNhaCungCap],
-                    to: [khoAnPhu, khoHoangLam]
-                },
-                'Nhập Chuển Kho': {
-                    from: [khoAnPhu, khoHoangLam],
-                    to: [khoAnPhu, khoHoangLam]
-                },
-                'Xuất Bán': {
-                    from: [khoAnPhu, khoHoangLam],
-                    to: [khoKhachHang]
-                },
-                'Xuất Tạm': {
-                    from: [khoAnPhu, khoHoangLam],
-                    to: [khoKhachHang]
-                },
-                'Xuất Chuyển Kho': {
-                    from: [khoAnPhu, khoHoangLam],
-                    to: [khoAnPhu, khoHoangLam]
-                }
-            };
-
-            const currentOptions = options[nghiepVu] || { from: [], to: [] };
-
-            currentOptions.from.forEach(opt => addOption(tuKho, ...opt));
-            currentOptions.to.forEach(opt => addOption(denKho, ...opt));
-
-            // Nếu chỉ có một lựa chọn, chọn nó mặc định
-            if (tuKho.options.length === 1) tuKho.selectedIndex = 0;
-            if (denKho.options.length === 1) denKho.selectedIndex = 0;
-
-            // Đối với Nhập Chuyển Kho và Xuất Chuyển Kho, đảm bảo kho đến khác kho đi
-            if (nghiepVu === 'Nhập Chuển Kho' || nghiepVu === 'Xuất Chuyển Kho') {
-                tuKho.addEventListener('change', () => {
-                    denKho.innerHTML = '';
-                    currentOptions.to.forEach(opt => {
-                        if (opt[1] !== tuKho.value) {
-                            addOption(denKho, ...opt);
-                        }
-                    });
-                    if (denKho.options.length === 1) denKho.selectedIndex = 0;
-                });
-                // Kích hoạt sự kiện change để cập nhật kho đến ban đầu
-                tuKho.dispatchEvent(new Event('change'));
-            }
-
-            soPhieuInput.value = generateSoPhieu(nghiepVu, tuKho.value, denKho.value);
-        };
-        // Hàm tạo số phiếu tự động
-        const generateSoPhieu = (nghiepVu, tuDau, denDau) => {
-            const prefixMap = new Map([
-                ['Nhập Mua Hàng', 'NMH'], ['Nhập Trả Hàng', 'NTH'], ['Nhập Tạm', 'NTA'],
-                ['Nhập Chuển Kho', 'NCK'], ['Xuất Bán', 'XBA'], ['Xuất Tạm', 'XTA'], ['Xuất Chuyển Kho', 'XCK']
-            ]);
-            const locationMap = new Map([
-                ['Kho Nhà Cung Cấp', 'NC'], ['Kho An Phú', 'AP'], ['Kho Hoàng Lâm', 'HL'], ['Kho Khách Hàng', 'KH']
-            ]);
-            const prefix = prefixMap.get(nghiepVu) ?? 'XXX';
-            const from = locationMap.get(tuDau) ?? 'XX';
-            const to = locationMap.get(denDau) ?? 'XX';
-            const date = new Date();
-            const dateStr = `${date.getDate().toString().padStart(2, '0')}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getFullYear().toString().slice(-2)}`;
-            return `${prefix}-${from}-${to}-${dateStr}-001`;
-        };
-        // Hàm thêm option vào select element
-        const addOption = (selectElement, text, value, selected = false) => {
-            const option = new Option(text, value, selected, selected);
-            selectElement.add(option);
-        };
-
-        function updateChungTuDiKem() {
-            const nghiepVuSelect = document.getElementById('nghiepVu');
-            const chungTuDiKemSelect = document.getElementById('chungTuDiKem');
-
-            chungTuDiKemSelect.innerHTML = '<option value="">Chọn chứng từ</option>';
-
-            if (nghiepVuSelect.value.startsWith('Nhập')) {
-                const uniqueInvoices = [...new Set(sheetData.packingList.map(item => item.INVOICE))];
-                uniqueInvoices.forEach(invoice => {
-                    const option = document.createElement('option');
-                    option.value = invoice;
-                    option.textContent = invoice;
-                    chungTuDiKemSelect.appendChild(option);
-                });
-            }
-        }
-
-        const savePNKData = async () => {
-            try {
-                // Lấy dữ liệu từ form
-                const formData = new FormData(document.getElementById('pnkForm'));
-                const pnkData = Object.fromEntries(formData.entries());
-
-                // Chuẩn bị dữ liệu để gửi
-                const dataToSend = {
-                    action: 'addPNK',
-                    data: [{
-                        ['Loại phiếu']: pnkData.loaiPhieu,
-                        ['Nghiệp vụ']: pnkData.nghiepVu,
-                        ['Số phiếu']: pnkData.soPhieu,
-                        ['Ngày tháng']: pnkData.ngayThang,
-                        ['Từ đâu']: pnkData.tuDau,
-                        ['Đến đâu']: pnkData.denDau,
-                        ['Diễn giải']: pnkData.dienGiai,
-                        ['Chứng từ đi kèm']: pnkData.chungTuDiKem
-                        // Thêm các trường khác nếu cần
-                    }]
-                };
-
-                // Gửi dữ liệu đến server
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(dataToSend)
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    FuiToast.success('Đã lưu dữ liệu PNK thành công: ' + result.message);
-                    // Có thể thêm code để reset form hoặc cập nhật UI ở đây
-                } else {
-                    const errorText = await response.text();
-                    FuiToast.error('Lỗi khi lưu dữ liệu PNK: ' + errorText);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                FuiToast.error('Lỗi không lưu được data lên server, liên hệ admin.');
-            }
-        };
-
-        // Hàm cập nhật số phiếu
-        const updateSoPhieu = () => {
-            const { value: nghiepVu } = document.getElementById('nghiepVu');
-            const { value: tuKho } = document.getElementById('tuDau');
-            const { value: denKho } = document.getElementById('denDau');
-            const soPhieuInput = document.getElementById('soPhieu');
-            soPhieuInput.value = generateSoPhieu(nghiepVu, tuKho, denKho);
-        };
 
 
-        // Hàm cập nhật bảng Packing List đã chọn
-        const updateSelectedPackingList = () => {
-            const selectedInvoice = $('#chungTuDiKem').val();
-            const nghiepVu = $('#nghiepVu').val();
-            const tuKho = $('#tuDau').val();
-
-            console.log('Selected Invoice:', selectedInvoice);
-            console.log('Nghiep Vu:', nghiepVu);
-            console.log('Tu Kho:', tuKho);
-
-            if (!selectedInvoice) {
-                console.log('No invoice selected');
-                return; // Không làm gì nếu không có invoice được chọn
-            }
-
-            let filteredData = sheetData.packingList.filter(row => row['INVOICE'] === selectedInvoice);
-
-            console.log('Filtered data before processing:', filteredData);
-
-            // Cập nhật trạng thái cho mỗi kiện
-            filteredData = filteredData.map(row => {
-                const maKien = row['MÃ KIỆN'];
-                const status = calculatePackingStatus(maKien);
-                const currentWarehouse = getCurrentWarehouse(maKien);
-                return { ...row, 'Trạng thái kiện': status, 'Kho hiện tại': currentWarehouse };
-            });
-
-            console.log('Filtered data after processing:', filteredData);
-
-            // Lọc dữ liệu dựa trên nghiệp vụ và trạng thái kiện mới
-            switch (nghiepVu) {
-                case 'Nhập Mua Hàng':
-                    filteredData = filteredData.filter(row => row['Trạng thái kiện'] === 'Đang về');
-                    break;
-                case 'Xuất Bán':
-                case 'Xuất Tạm':
-                case 'Xuất Chuyển Kho':
-                    filteredData = filteredData.filter(row => row['Trạng thái kiện'] === 'Tồn kho' && row['Kho hiện tại'] === tuKho);
-                    break;
-                default:
-                    break;
-            }
-
-            console.log('Final filtered data:', filteredData);
-
-            // Render bảng
-            if ($.fn.DataTable.isDataTable('#selectedPackingListTable')) {
-                $('#selectedPackingListTable').DataTable().destroy();
-            }
-            $('#selectedPackingListTable').empty(); // Xóa nội dung cũ của bảng
-
-            $('#selectedPackingListTable').DataTable({
-                data: filteredData,
-                columns: [
-                    ...Object.keys(filteredData[0] || {}).map(key => ({ title: key, data: key })),
-                    {
-                        title: 'Chọn',
-                        render: (data, type, row) => `
-                    <label class="fui-checkbox-toggle">
-                        <input type="checkbox" id="toggle-input" class="toggle-input" value="${row['MÃ KIỆN']}" checked />
-                        <div class="toggle-bar">
-                            <div class="toggle-spin"></div>
-                        </div>
-                    </label>
-                `
-                    }
-                ],
-                destroy: true
-            });
-        };
-        const calculatePackingStatus = (maKien) => {
-            console.log('calculatePackingStatus called with:', maKien);
-            console.log('sheetData:', sheetData);
-            console.log('sheetData.pnkData:', sheetData?.pnkData);
-
-            if (!sheetData || !sheetData.pnkData || !Array.isArray(sheetData.pnkData)) {
-                console.error('sheetData or pnkData is undefined or not an array');
-                return 'Không xác định';
-            }
-            // Sắp xếp các phiếu nhập xuất theo thời gian
-            const sortedPNK = sheetData.pnkData.slice(1).filter(row => row[7] === maKien)
-                .sort((a, b) => new Date(a[2]) - new Date(b[2]));
-
-            let currentStatus = 'Đang về';
-            let currentKho = '';
-
-            for (const pnk of sortedPNK) {
-                const nghiepVu = pnk[0];
-                const tuKho = pnk[3];
-                const denKho = pnk[4];
-
-                switch (nghiepVu) {
-                    case 'Nhập Mua Hàng':
-                        currentStatus = 'Tồn kho';
-                        currentKho = denKho;
-                        break;
-                    case 'Xuất Bán':
-                    case 'Xuất Tạm':
-                        if (currentStatus === 'Tồn kho' && tuKho === currentKho) {
-                            currentStatus = 'Hết hàng';
-                            currentKho = denKho;
-                        }
-                        break;
-                    case 'Xuất Chuyển Kho':
-                        if (currentStatus === 'Tồn kho' && tuKho === currentKho) {
-                            currentKho = denKho;
-                        }
-                        break;
-                }
-            }
-
-            return currentStatus;
-        };
-        //hàm để xác định kho hiện tại của một kiện:
-        const getCurrentWarehouse = (maKien) => {
-            console.log('getCurrentWarehouse called with:', maKien);
-            console.log('sheetData:', sheetData);
-            console.log('sheetData.pnkData:', sheetData?.pnkData);
-
-            if (!sheetData || !sheetData.pnkData || !Array.isArray(sheetData.pnkData)) {
-                console.error('sheetData or pnkData is undefined or not an array');
-                return null;
-            }
-            const sortedPNK = sheetData.pnkData.slice(1).filter(row => row[7] === maKien)
-                .sort((a, b) => new Date(b[2]) - new Date(a[2]));
-
-
-            if (sortedPNK.length > 0) {
-                const lastPNK = sortedPNK[0];
-                if (lastPNK[0].startsWith('Nhập')) {
-                    return lastPNK[4]; // Đến đâu
-                } else if (lastPNK[0].startsWith('Xuất')) {
-                    return lastPNK[3]; // Từ đâu
-                }
-            }
-
-            return null; // Kiện chưa được nhập kho
-        };
-        function addPNKToTable(pnkData) {
-            const table = document.getElementById('pnk-table');
-            if (!table) {
-                console.error('Table with id "pnk-table" not found');
-                return;
-            }
-
-            // Kiểm tra xem bảng đã có tbody chưa
-            let tbody = table.getElementsByTagName('tbody')[0];
-            if (!tbody) {
-                tbody = document.createElement('tbody');
-                table.appendChild(tbody);
-            }
-
-            const newRow = tbody.insertRow();
-
-            // Thêm các ô dữ liệu vào hàng mới
-            newRow.insertCell().textContent = pnkData.nghiepVu;
-            newRow.insertCell().textContent = pnkData.soPhieu;
-            newRow.insertCell().textContent = pnkData.ngayThang;
-            newRow.insertCell().textContent = pnkData.tuDau;
-            newRow.insertCell().textContent = pnkData.denDau;
-            newRow.insertCell().textContent = pnkData.dienGiai;
-            newRow.insertCell().textContent = pnkData.chungTuDiKem;
-
-            // Thêm nút xóa
-            const deleteCell = newRow.insertCell();
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = 'Xóa';
-            deleteButton.className = 'btn btn-danger btn-sm';
-            deleteButton.onclick = function () {
-                tbody.deleteRow(newRow.rowIndex - 1);
-            };
-            deleteCell.appendChild(deleteButton);
-        }
-        document.addEventListener('DOMContentLoaded', function () {
-            const table = document.getElementById('pnk-table');
-            if (!table) {
-                console.error('Table with id "pnk-table" not found');
-                return;
-            }
-
-            // Thêm thead nếu chưa có
-            if (!table.getElementsByTagName('thead').length) {
-                const thead = document.createElement('thead');
-                const headerRow = thead.insertRow();
-                ['Nghiệp vụ', 'Số phiếu', 'Ngày tháng', 'Từ kho', 'Đến kho', 'Diễn giải', 'Chứng từ đi kèm', 'Hành động'].forEach(text => {
-                    const th = document.createElement('th');
-                    th.textContent = text;
-                    headerRow.appendChild(th);
-                });
-                table.appendChild(thead);
-            }
-
-            // Thêm tbody nếu chưa có
-            if (!table.getElementsByTagName('tbody').length) {
-                table.appendChild(document.createElement('tbody'));
-            }
-
-            // Xử lý sự kiện submit form
-            const form = document.getElementById('pnkForm');
-            if (form) {
-                form.addEventListener('submit', function (e) {
-                    e.preventDefault();
-                    const formData = new FormData(form);
-                    const pnkData = Object.fromEntries(formData.entries());
-                    addPNKToTable(pnkData);
-                    form.reset();
-                });
-            } else {
-                console.error('Form with id "pnkForm" not found');
-            }
-        });
         document.addEventListener('DOMContentLoaded', function () {
             fetchData();
+        });
+
+        // Giả sử sheetData đã được định nghĩa ở đâu đó trong code của bạn
+        function createInventoryReport(sheetData) {
+            const { packingList, pnkData } = sheetData;
+            const inventoryReport = [];
+
+            for (const item of packingList) {
+                const inventoryItem = {
+                    MÃ_KIỆN: item['MÃ KIỆN'] || '',
+                    TÊN_GỖ: item['TÊN GỖ'] || '',
+                    KHỐI_LƯỢNG_THỰC_TẾ: item['KHỐI LƯỢNG THỰC TẾ'] || '',
+                    SỐ_THANH_THỰC_TẾ: item['SỐ THANH THỰC TẾ'] || '',
+                    CHIỀU_DÀI_THỰC_TẾ: item['CHIỀU DÀI THỰC TẾ'] || '',
+                    CHIỀU_RỘNG_THỰC_TẾ: item['CHIỀU RỘNG THỰC TẾ'] || '',
+                    KHO_HIỆN_TẠI: "",
+                    TRẠNG_THÁI: "Đang về"
+                };
+
+                if (pnkData && pnkData.length > 0) {
+                    const relatedPnk = pnkData.filter(p => p.danhSáchKiện && p.danhSáchKiện.includes(item['MÃ KIỆN']));
+                    if (relatedPnk.length > 0) {
+                        const latestPnk = relatedPnk.reduce((a, b) => new Date(a.ngàyTháng) > new Date(b.ngàyTháng) ? a : b);
+                        if (latestPnk.loạiNghiệpVụ && latestPnk.loạiNghiệpVụ.startsWith("Nhập")) {
+                            inventoryItem.TRẠNG_THÁI = "Tồn kho";
+                            inventoryItem.KHO_HIỆN_TẠI = latestPnk.đếnKho || "";
+                        } else {
+                            inventoryItem.TRẠNG_THÁI = "Hết hàng";
+                        }
+                    }
+                }
+
+                inventoryReport.push(inventoryItem);
+            }
+
+            return inventoryReport;
+        }
+        function displayInventoryReport(inventoryReport) {
+            const table = $('#inventoryTable');
+            if ($.fn.DataTable.isDataTable(table)) {
+                table.DataTable().destroy();
+            }
+
+            table.DataTable({
+                data: inventoryReport,
+                columns: [
+                    { data: 'MÃ_KIỆN', title: 'MÃ KIỆN' },
+                    { data: 'TÊN_GỖ', title: 'TÊN GỖ' },
+                    { data: 'KHỐI_LƯỢNG_THỰC_TẾ', title: 'KHỐI LƯỢNG THỰC TẾ' },
+                    { data: 'SỐ_THANH_THỰC_TẾ', title: 'SỐ THANH THỰC TẾ' },
+                    { data: 'CHIỀU_DÀI_THỰC_TẾ', title: 'CHIỀU DÀI THỰC TẾ' },
+                    { data: 'CHIỀU_RỘNG_THỰC_TẾ', title: 'CHIỀU RỘNG THỰC TẾ' },
+                    { data: 'KHO_HIỆN_TẠI', title: 'KHO HIỆN TẠI' },
+                    { data: 'TRẠNG_THÁI', title: 'TRẠNG THÁI' }
+                ],
+                responsive: true,
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.10.24/i18n/Vietnamese.json'
+                },
+                dom: '<"top"Bfl>rt<"bottom"ip><"clear">',
+                buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Tất cả"]],
+                pageLength: 10,
+                order: [[0, 'asc']], // Sắp xếp theo cột đầu tiên (MÃ KIỆN) tăng dần
+                searching: true,
+                info: true,
+                paging: true
+            });
+        }
+        function updateInventoryReport() {
+            const inventoryReport = createInventoryReport(sheetData);
+            displayInventoryReport(inventoryReport);
+        }
+        // Khi tab Báo Cáo Tồn Kho được chọn
+        document.getElementById('inventory-tab').addEventListener('shown.bs.tab', function (e) {
+            updateInventoryReport();
         });
 
     </script>
