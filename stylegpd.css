@@ -15,7 +15,7 @@ body {
     padding-top: 0;
     /* Loại bỏ padding-top nếu có */
     background-color: #f8f9fa;
-    
+
 }
 
 /* Reset css */
@@ -170,13 +170,16 @@ table td {
     background-color: #fff;
     transition: transform 0.2s linear;
 }
+
 .modal-dialog.modal-xl {
     max-width: 90%;
     width: fit-content;
 }
+
 .modal-content {
     width: fit-content;
 }
+
 .modal-body {
     overflow-x: auto;
 }
@@ -194,8 +197,9 @@ table td {
     position: relative;
     width: 80px;
     height: 80px;
-  }
-  .fui-loading-hourglass:after {
+}
+
+.fui-loading-hourglass:after {
     content: " ";
     display: block;
     border-radius: 50%;
@@ -206,17 +210,20 @@ table td {
     border: 32px solid #1dc071;
     border-color: #1dc071 rgba(0, 0, 0, 0) #1dc071 rgba(0, 0, 0, 0);
     animation: JPup5 1.2s infinite;
-  }
-  @keyframes JPup5 {
+}
+
+@keyframes JPup5 {
     0% {
-      transform: rotate(0);
-      animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+        transform: rotate(0);
+        animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
     }
+
     50% {
-      transform: rotate(900deg);
-      animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+        transform: rotate(900deg);
+        animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
     }
+
     100% {
-      transform: rotate(1800deg);
+        transform: rotate(1800deg);
     }
-  }
+}
