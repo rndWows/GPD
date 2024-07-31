@@ -18,12 +18,8 @@
 
 <body>
     <div id="fui-toast"></div>
-    <div id="loading-overlay">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Đang tải...</span>
-        </div>
-    </div>
-    <div id="content" class="" style="display: none;">
+
+    <div id="content" class="">
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="packing-list-tab" data-bs-toggle="tab"
@@ -43,9 +39,10 @@
                     role="tab" aria-controls="pnk" aria-selected="false">PNK</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="inventory-tab" data-bs-toggle="tab" data-bs-target="#inventory"
-                    type="button" role="tab" aria-controls="inventory" aria-selected="false">Báo Cáo Tồn Kho</button>
+                <button class="nav-link" id="tonkho-tab" data-bs-toggle="tab" data-bs-target="#tonkho" type="button"
+                    role="tab" aria-controls="tonkho" aria-selected="false">Tồn kho</button>
             </li>
+
         </ul>
         <div class="tab-content" id="myTabContent">
 
@@ -92,8 +89,7 @@
                                 <div class="row">
                                     <div class="col-md-3 mb-3">
                                         <label for="nghiepVu" class="form-label">Loại nghiệp vụ:</label>
-                                        <select class="form-select" id="nghiepVu" name="nghiepVu"
-                                            onchange="updateLocationFields()" required>
+                                        <select class="form-select" id="nghiepVu" name="nghiepVu" required>
                                             <optgroup label="Nhập kho">
                                                 <option value="Nhập Mua Hàng">Nhập mua hàng</option>
                                                 <option value="Nhập Trả Hàng">Nhập trả hàng</option>
@@ -146,9 +142,42 @@
                             </div>
                         </form>
 
-                        <h3>Packing List cho INVOICE đã chọn</h3>
+                        <h3>Packing List cho chứng từ đã đã chọn</h3>
                         <table id="selectedPackingListTable" class="fui-table-ui-basic-linh table-wrap"
                             style="width: 100%;">
+
+                        </table>
+
+                        <h3>Danh sách PNK</h3>
+
+                    </div>
+                </div>
+                <table id="pnk-table" class="fui-table-ui-basic-linh table-wrap" style="width: 100%;"></table>
+            </div>
+            <div class="tab-pane fade" id="tonkho" role="tabpanel" aria-labelledby="tonkho-tab">
+                <div class="card">
+                    <div class="card-body">
+                        <h3>Bảng Nhóm</h3>
+                        <table id="groupTable" class="display" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>TÊN GỖ</th>
+                                    <th>KHỐI LƯỢNG THỰC TẾ</th>
+                                    <th>SỐ THANH THỰC TẾ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dữ liệu sẽ được điền vào đây bởi DataTables -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h3>Bảng Tồn Kho</h3>
+                        <table id="inventoryTable" class="display" style="width:100%">
                             <thead>
                                 <tr>
                                     <th>TỜ KHAI</th>
@@ -168,46 +197,35 @@
                                     <th>CHIỀU DÀI THỰC TẾ</th>
                                     <th>CHIỀU RỘNG THỰC TẾ</th>
                                     <th>MÃ KIỆN TRÊN PL</th>
-                                    <th>Trạng thái kiện</th>
-                                    <th>Chọn</th>
+                                    <th>Trạng thái kho</th>
+                                    <th>Kho giữ</th>
                                 </tr>
                             </thead>
-                            <tbody></tbody>
-                        </table>
-
-                        <h3>Danh sách PNK</h3>
-                        <button id="saveButton" class="btn btn-success mb-2">Lưu dữ liệu PNK vào
-                            database</button>
-                    </div>
-                </div>
-                <table id="pnk-table" class="fui-table-ui-basic-linh table-wrap" style="width: 100%;"></table>
-            </div>
-            <div class="tab-pane fade" id="inventory" role="tabpanel" aria-labelledby="inventory-tab">
-                <div class="card">
-                    <div class="card-header bg-info text-white">
-                        <h2>Báo Cáo Tồn Kho</h2>
-                    </div>
-                    <div class="card-body">
-                        <table id="inventoryTable" class="table table-striped table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>MÃ KIỆN</th>
-                                    <th>TÊN GỖ</th>
-                                    <th>KHỐI LƯỢNG THỰC TẾ</th>
-                                    <th>SỐ THANH THỰC TẾ</th>
-                                    <th>CHIỀU DÀI THỰC TẾ</th>
-                                    <th>CHIỀU RỘNG THỰC TẾ</th>
-                                    <th>KHO HIỆN TẠI</th>
-                                    <th>TRẠNG THÁI</th>
-                                </tr>
-                            </thead>
-                            <tbody id="inventoryTableBody">
-                                <!-- Dữ liệu sẽ được điền vào đây bằng JavaScript -->
+                            <tbody>
+                                <!-- Dữ liệu sẽ được điền vào đây bởi DataTables -->
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
+
+
+
+            <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="detailModalLabel">Chi tiết</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" id="detailContent">
+                            <!-- Detail content will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -226,16 +244,163 @@
     <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
     <script
         src="https://cdn.jsdelivr.net/gh/lelinh014756/fui-toast-js@master/assets/js/toast@1.0.1/fuiToast.min.js"></script>
+
     <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbyKqoJs53LTmIMhW9RXHN79hDHur95r6b7tnt4HVaCZYnch-loT6albaQNtSffjyfHY/exec';
-        let sheetData = {
-            packingList: [],
-            bg: [],
-            bgDetail: [],
-            dh: [],
-            dhDetail: [],
-            pnk: []
-        };
+        const API_URL = 'https://script.google.com/macros/s/AKfycbx1Eyos1Vc_kq-PU1rOh-OdH2lOHex05U8wAYTiFCLRIgX5THWDQ46g8WgH_OanBFIL/exec';
+        let allSheetData;
+        function getSheetData(sheetId, sheetName) {
+            if (allSheetData && allSheetData[sheetId] && allSheetData[sheetId][sheetName]) {
+                return allSheetData[sheetId][sheetName];
+            }
+            return [];
+        }
+        const tableConfigs = [
+            {
+                sheetId: "1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998",
+                sheetName: "PACKING LIST",
+                columns: ['TỜ KHAI', 'NGÀY TỜ KHAI', 'ĐƠN GIÁ (USD)', 'ĐƠN GIÁ (EUR)', 'TỶ GIÁ',
+                    'FSC', 'XUẤT XỨ', 'INVOICE', 'TÊN NHÀ CUNG CẤP', 'SỐ CONTAINER', 'TÊN GỖ',
+                    'MÃ KIỆN', 'KHỐI LƯỢNG THỰC TẾ', 'SỐ THANH THỰC TẾ', 'CHIỀU DÀI THỰC TẾ', 'CHIỀU RỘNG THỰC TẾ', 'MÃ KIỆN TRÊN PL'
+                ],
+                tableId: "packing-list-table",
+                detailConfigs: [
+                    {
+                        sheetId: "1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998",
+                        sheetName: "BG_DETAIL",
+                        linkColumns: [
+                            { parent: "MÃ KIỆN", child: "MÃ KIỆN" }
+                        ],
+                        columns: ['SỐ BÁO GIÁ', 'MÃ SẢN PHẨM', 'TÊN SẢN PHẨM', 'ĐVT', 'MÃ KIỆN']
+                    },
+                    {
+                        sheetId: "1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998",
+                        sheetName: "ĐH_DETAIL",
+                        linkColumns: [
+                            { parent: "MÃ KIỆN", child: "MÃ KIỆN" }
+                        ],
+                        columns: ['SỐ ĐƠN HÀNG', 'MÃ SẢN PHẨM', 'TÊN SẢN PHẨM', 'ĐVT', 'MÃ KIỆN', 'SỐ CONTAINER', 'KHỐI LƯỢNG', 'SỐ THANH', 'CHIỀU DÀI', 'CHIỀU RỘNG']
+                    },
+                    {
+                        sheetId: "1tzyxVXDZyk7FQtYm8nFYskisu5gdAf2QoV3SoDCzIRY",
+                        sheetName: "PNK",
+                        linkColumns: [
+                            { parent: "MÃ KIỆN", child: "MÃ KIỆN" }
+                        ],
+                        columns: ['NGHIỆP VỤ', 'SỐ PHIẾU', 'NGÀY THÁNG', 'TỪ ĐÂU', 'ĐẾN ĐÂU', 'DIỄN GIẢI', 'CHỨNG TỪ ĐI KÈM', 'MÃ KIỆN']
+                    }
+                ]
+            },
+            {
+                sheetId: "1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998",
+                sheetName: "BG",
+                columns: ['NGÀY BÁO GIÁ', 'NHÂN VIÊN SALES PHỤ TRÁCH', 'SỐ BÁO GIÁ', 'TÊN VIẾT TẮT', 'TÊN CÔNG TY'],
+                tableId: "dh-table",
+                detailConfigs: [
+                    {
+                        sheetId: "1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998",
+                        sheetName: "BG_DETAIL",
+                        linkColumns: [
+                            { parent: "SỐ BÁO GIÁ", child: "SỐ BÁO GIÁ" }
+                        ],
+                        columns: ['SỐ BÁO GIÁ', 'MÃ SẢN PHẨM', 'TÊN SẢN PHẨM', 'ĐVT', 'MÃ KIỆN']
+                    },
+                    {
+                        sheetId: "1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998",
+                        sheetName: "PACKING LIST",
+                        linkColumns: [
+                            { parent: "MÃ KIỆN", child: "MÃ KIỆN" }
+                        ],
+                        columns: ['TỜ KHAI', 'NGÀY TỜ KHAI', 'ĐƠN GIÁ (USD)', 'ĐƠN GIÁ (EUR)', 'TỶ GIÁ',
+                            'FSC', 'XUẤT XỨ', 'INVOICE', 'TÊN NHÀ CUNG CẤP', 'SỐ CONTAINER', 'TÊN GỖ',
+                            'MÃ KIỆN', 'KHỐI LƯỢNG THỰC TẾ', 'SỐ THANH THỰC TẾ', 'CHIỀU DÀI THỰC TẾ', 'CHIỀU RỘNG THỰC TẾ', 'MÃ KIỆN TRÊN PL'
+                        ],
+                    },
+                    {
+                        sheetId: "1tzyxVXDZyk7FQtYm8nFYskisu5gdAf2QoV3SoDCzIRY",
+                        sheetName: "PNK",
+                        linkColumns: [
+                            { parent: "CHỨNG TỪ ĐI KÈM", child: "SỐ BÁO GIÁ" }
+                        ],
+                        columns: ['NGHIỆP VỤ', 'SỐ PHIẾU', 'NGÀY THÁNG', 'TỪ ĐÂU', 'ĐẾN ĐÂU', 'DIỄN GIẢI', 'CHỨNG TỪ ĐI KÈM', 'MÃ KIỆN']
+                    }
+                ]
+            },
+            {
+                sheetId: "1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998",
+                sheetName: "ĐH",
+                columns: ['NGÀY ĐƠN HÀNG', 'SỐ ĐƠN HÀNG', 'SỐ BÁO GIÁ', 'NGÀY HỢP ĐỒNG', 'SỐ HỢP ĐỒNG', 'LOẠI HỢP ĐỒNG', 'TÊN VIẾT TẮT', 'TÊN CÔNG TY'],
+                tableId: "bg-table",
+                detailConfigs: [
+                    {
+                        sheetId: "1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998",
+                        sheetName: "ĐH_DETAIL",
+                        linkColumns: [
+                            { parent: "SỐ ĐƠN HÀNG", child: "SỐ ĐƠN HÀNG" }
+                        ],
+                        columns: ['SỐ ĐƠN HÀNG', 'MÃ SẢN PHẨM', 'TÊN SẢN PHẨM', 'ĐVT', 'MÃ KIỆN']
+                    },
+                    {
+                        sheetId: "1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998",
+                        sheetName: "PACKING LIST",
+                        linkColumns: [
+                            { parent: "MÃ KIỆN", child: "MÃ KIỆN" }
+                        ],
+                        columns: ['TỜ KHAI', 'NGÀY TỜ KHAI', 'ĐƠN GIÁ (USD)', 'ĐƠN GIÁ (EUR)', 'TỶ GIÁ',
+                            'FSC', 'XUẤT XỨ', 'INVOICE', 'TÊN NHÀ CUNG CẤP', 'SỐ CONTAINER', 'TÊN GỖ',
+                            'MÃ KIỆN', 'KHỐI LƯỢNG THỰC TẾ', 'SỐ THANH THỰC TẾ', 'CHIỀU DÀI THỰC TẾ', 'CHIỀU RỘNG THỰC TẾ', 'MÃ KIỆN TRÊN PL'
+                        ],
+                    },
+                    {
+                        sheetId: "1tzyxVXDZyk7FQtYm8nFYskisu5gdAf2QoV3SoDCzIRY",
+                        sheetName: "PNK",
+                        linkColumns: [
+                            { parent: "CHỨNG TỪ ĐI KÈM", child: "MÃ SẢN PHẨM" }
+                        ],
+                        columns: ['NGHIỆP VỤ', 'SỐ PHIẾU', 'NGÀY THÁNG', 'TỪ ĐÂU', 'ĐẾN ĐÂU', 'DIỄN GIẢI', 'CHỨNG TỪ ĐI KÈM', 'MÃ KIỆN']
+                    }
+                ]
+            },
+            {
+                sheetId: "1tzyxVXDZyk7FQtYm8nFYskisu5gdAf2QoV3SoDCzIRY",
+                sheetName: "PNK",
+                columns: ['NGHIỆP VỤ', 'SỐ PHIẾU', 'NGÀY THÁNG', 'TỪ ĐÂU', 'ĐẾN ĐÂU', 'DIỄN GIẢI', 'CHỨNG TỪ ĐI KÈM', 'MÃ KIỆN'],
+                tableId: "pnk-table",
+                detailConfigs: [
+                    {
+                        sheetId: "1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998",
+                        sheetName: "ĐH",
+                        columns: ['NGÀY ĐƠN HÀNG', 'SỐ ĐƠN HÀNG', 'SỐ BÁO GIÁ', 'NGÀY HỢP ĐỒNG', 'SỐ HỢP ĐỒNG', 'LOẠI HỢP ĐỒNG', 'TÊN VIẾT TẮT', 'TÊN CÔNG TY'],
+                        linkColumns: [
+                            { parent: "CHỨNG TỪ ĐI KÈM", child: "SỐ ĐƠN HÀNG" }
+                        ],
+
+                    },
+                    {
+                        sheetId: "1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998",
+                        sheetName: "BG",
+                        columns: ['NGÀY BÁO GIÁ', 'NHÂN VIÊN SALES PHỤ TRÁCH', 'SỐ BÁO GIÁ', 'TÊN VIẾT TẮT', 'TÊN CÔNG TY'],
+                        linkColumns: [
+                            { parent: "CHỨNG TỪ ĐI KÈM", child: "SỐ BÁO GIÁ" }
+                        ],
+
+                    },
+                    {
+                        sheetId: "1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998",
+                        sheetName: "PACKING LIST",
+                        linkColumns: [
+                            { parent: "MÃ KIỆN", child: "MÃ KIỆN" },
+                            { parent: "INVOICE", child: "CHỨNG TỪ ĐI KÈM" }
+
+                        ],
+                        columns: ['TỜ KHAI', 'NGÀY TỜ KHAI', 'ĐƠN GIÁ (USD)', 'ĐƠN GIÁ (EUR)', 'TỶ GIÁ',
+                            'FSC', 'XUẤT XỨ', 'INVOICE', 'TÊN NHÀ CUNG CẤP', 'SỐ CONTAINER', 'TÊN GỖ',
+                            'MÃ KIỆN', 'KHỐI LƯỢNG THỰC TẾ', 'SỐ THANH THỰC TẾ', 'CHIỀU DÀI THỰC TẾ', 'CHIỀU RỘNG THỰC TẾ', 'MÃ KIỆN TRÊN PL'
+                        ],
+                    }
+                ]
+            }
+        ];
+
 
         // Hàm chuyển đổi định dạng ngày
         function formatDate(dateString) {
@@ -266,416 +431,575 @@
 
         // Áp dụng cho sheetData sau khi đã lấy dữ liệu
         function applyDateFormatting() {
-            processDateFields(sheetData);
+            processDateFields(allSheetData);
+        }
+        async function getAllData() {
+            const resPromise = fetch(`${API_URL}?action=getAllData`)
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        allSheetData = result.data;
+                        applyDateFormatting();
+                        displayConfiguredTables();
+                        createInventoryTable();
+                        createGroupTable();
+                        return result.data;
+                    } else {
+                        FuiToast.error('Lỗi tìm nạp dữ liệu');
+                    }
+                })
+                .catch(error => {
+                    FuiToast.error('Lỗi:', error);
+                    throw error;
+                });
+
+            FuiToast.promise(
+                resPromise,
+                {
+                    loading: 'Đang tải dữ liệu từ server...',
+                    success: (data) => {
+                        console.log(data);
+                        initializePNKForm();
+
+                        return 'Tải dữ liệu thành công!';
+                    },
+                    error: 'Tải thất bại vui lòng kiểm tra lại mạng!',
+                },
+                {
+                    isClose: true
+                }
+            );
         }
 
-        async function fetchData() {
+        function getSpecificColumns(sheetId, sheetName, columnNames) {
             try {
-                document.getElementById('loading-overlay').style.display = 'block';
-                document.getElementById('content').style.display = 'none';
+                console.log(`Getting data for sheetId: ${sheetId}, sheetName: ${sheetName}`);
+                console.log('Requested columns:', columnNames);
 
-                const response = await fetch(API_URL);
-                const data = await response.json();
+                if (allSheetData && allSheetData[sheetId] && allSheetData[sheetId][sheetName]) {
+                    const sheetData = allSheetData[sheetId][sheetName];
+                    console.log('Raw sheet data:', sheetData);
 
-                // Chuyển đổi dữ liệu nếu cần
-                sheetData = {
-                    packingList: Object.values(data.packingList || {}),
-                    bg: Object.values(data.bg || {}),
-                    bgDetail: data.bgDetail || [],
-                    dh: Object.values(data.dh || {}),
-                    dhDetail: data.dhDetail || [],
-                    pnkData: Object.values(data.pnk || {})
-
-                };
-
-                // Kiểm tra và đảm bảo rằng mỗi thuộc tính là một mảng
-                for (let key in sheetData) {
-                    if (!Array.isArray(sheetData[key])) {
-                        console.warn(`sheetData.${key} is not an array, setting to empty array`);
-                        sheetData[key] = [];
-                    }
-                }
-
-                // Áp dụng định dạng ngày
-
-                applyDateFormatting();
-                displayData();
-                updateInventoryReport();
-
-                document.getElementById('loading-overlay').style.display = 'none';
-                document.getElementById('content').style.display = 'block';
-                FuiToast.success(`Tải dữ liệu thành công`);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                FuiToast.error(`Lỗi tìm nạp dữ liệu`);
-                document.getElementById('loading-overlay').style.display = 'none';
-            }
-        }
-
-        function displayData() {
-            displayPackingListTable('packing-list-table', sheetData.packingList);
-            displayDHTable('dh-table', sheetData.dh);
-            displayBGTable('bg-table', sheetData.bg);
-            displayPNKTable('pnk-table', sheetData.pnkData)
-        }
-
-        function displayPackingListTable(tableId, data) {
-            const table = $(`#${tableId}`);
-            table.empty();
-
-            if (data && data.length > 0) {
-                const headers = ['TỜ KHAI', 'INVOICE', 'TÊN NHÀ CUNG CẤP', 'SỐ CONTAINER', 'TÊN GỖ', 'MÃ KIỆN', 'KHỐI LƯỢNG THỰC TẾ', 'SỐ THANH THỰC TẾ', 'CHIỀU DÀI THỰC TẾ', 'CHIỀU RỘNG THỰC TẾ', 'MÃ KIỆN TRÊN PL', 'Chi tiết'];
-                const tableData = data.map(row => {
-                    const rowData = headers.slice(0, -1).map(header => row[header] || '');
-                    rowData.push('<button class="btn btn-primary btn-sm detail-btn"><i class="fas fa-eye"></i></button>');
-                    return rowData;
-                });
-
-                if ($.fn.DataTable.isDataTable(`#${tableId}`)) {
-                    $(`#${tableId}`).DataTable().destroy();
-                }
-
-                $(`#${tableId}`).DataTable({
-                    data: tableData,
-                    columns: headers.map(header => ({ title: header })),
-                    responsive: true,
-                    language: {
-                        url: 'https://cdn.datatables.net/plug-ins/1.10.24/i18n/Vietnamese.json'
-                    },
-                    dom: 'Bfrtip',
-                    buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
-                });
-
-                $(`#${tableId} tbody`).on('click', '.detail-btn', function () {
-                    const rowData = $(`#${tableId}`).DataTable().row($(this).closest('tr')).data();
-                    showPackingListDetails(data.find(row => row['MÃ KIỆN'] === rowData[5]));
-                });
-            } else {
-                table.append($('<p>').text('Không có dữ liệu'));
-                FuiToast.warning(`Không có dữ liệu`);
-            }
-        }
-
-        function displayPNKTable(tableId, data) {
-            const table = $(`#${tableId}`);
-            table.empty();
-
-            if (data && data.length > 0) {
-                const headers = Object.keys(data[0]);
-                const thead = $('<thead>').append($('<tr>').append(headers.map(header => $('<th>').text(header))));
-                table.append(thead);
-
-                const tbody = $('<tbody>');
-                data.forEach(row => {
-                    const tr = $('<tr>');
-                    headers.forEach(header => {
-                        tr.append($('<td>').text(row[header] || ''));
+                    const filteredData = sheetData.map(row => {
+                        const filteredRow = {};
+                        columnNames.forEach(columnName => {
+                            if (columnName in row) {
+                                filteredRow[columnName] = row[columnName];
+                            } else {
+                                console.warn(`Column "${columnName}" not found in row:`, row);
+                            }
+                        });
+                        return filteredRow;
                     });
-                    tbody.append(tr);
-                });
-                table.append(tbody);
 
-                if ($.fn.DataTable.isDataTable(`#${tableId}`)) {
-                    $(`#${tableId}`).DataTable().destroy();
+                    console.log('Filtered data:', filteredData);
+                    return filteredData;
+                } else {
+                    console.error(`Data not found for sheetId: ${sheetId}, sheetName: ${sheetName}`);
+                    FuiToast.error(`Data not found for sheetId: ${sheetId}, sheetName: ${sheetName}`);
+                    return null;
                 }
-
-                $(`#${tableId}`).DataTable({
-                    responsive: true,
-                    language: {
-                        url: 'https://cdn.datatables.net/plug-ins/1.10.24/i18n/Vietnamese.json'
-                    },
-                    dom: 'Bfrtip',
-                    buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
-                });
-            } else {
-                table.append($('<p>').text('Không có dữ liệu PNK'));
-                FuiToast.warning(`Không có dữ liệu PNK`);
+            } catch (error) {
+                console.error('Error in getSpecificColumns:', error);
+                FuiToast.error('Error in getSpecificColumns: ' + error.message);
+                return null;
             }
         }
 
-        function showPackingListDetails(row) {
-            let modalContent = '<div class="modal-header"><h5 class="modal-title">Chi tiết Packing List</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>';
-            modalContent += '<div class="modal-body">';
-            for (let key in row) {
-                modalContent += `<p><strong>${key}:</strong> ${row[key]}</p>`;
-            }
-            modalContent += '</div>';
+        function displayConfiguredTables() {
+            tableConfigs.forEach(config => {
+                const { sheetId, sheetName, columns, tableId, detailConfigs } = config;
+                const table = document.getElementById(tableId);
 
-            $('#detailModal1 .modal-content').html(modalContent);
-            $('#detailModal1').modal('show');
-        }
+                if (table) {
+                    const tableData = getSpecificColumns(sheetId, sheetName, columns);
 
-        function displayBGTable(tableId, data) {
-            const table = $(`#${tableId}`);
-            table.empty();
+                    if (tableData && tableData.length > 0) {
+                        table.innerHTML = ''; // Clear existing content
 
-            if (data && data.length > 0) {
-                const headers = [...Object.keys(data[0]), 'Chi tiết'];
-                const tableData = data.map(row => {
-                    const rowData = headers.slice(0, -1).map(header => row[header] || '');
-                    rowData.push(`<button class="btn btn-primary btn-sm" onclick="showBGDetails('${row['SỐ BÁO GIÁ']}')"><i class="fas fa-eye"></i></button>`);
-                    return rowData;
-                });
-
-                if ($.fn.DataTable.isDataTable(`#${tableId}`)) {
-                    $(`#${tableId}`).DataTable().destroy();
-                }
-
-                $(`#${tableId}`).DataTable({
-                    data: tableData,
-                    columns: headers.map(header => ({ title: header })),
-                    responsive: true,
-                    language: {
-                        url: 'https://cdn.datatables.net/plug-ins/1.10.24/i18n/Vietnamese.json'
-                    },
-                    dom: 'Bfrtip',
-                    buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
-                });
-            } else {
-                table.append($('<p>').text('Không có dữ liệu'));
-                FuiToast.warning(`Không có dữ liệu`);
-            }
-        }
-
-        function showBGDetails(soBaoGia) {
-            const bgDetails = sheetData.bgDetail.filter(detail => detail['SỐ BÁO GIÁ'] === soBaoGia);
-            let modalContent = `
-        <div class="modal-header">
-            <h5 class="modal-title">Chi tiết Báo Giá: ${soBaoGia}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-    `;
-
-            if (bgDetails.length > 0) {
-                modalContent += '<table id="bgDetailTable" class="fui-table-ui-basic-linh table-wrap" style="width:100%"></table>';
-            } else {
-                modalContent += '<p>Không có chi tiết cho báo giá này.</p>';
-            }
-
-            modalContent += '</div>';
-
-            $('#detailModal .modal-content').html(modalContent);
-
-            if (bgDetails.length > 0) {
-                $('#bgDetailTable').DataTable({
-                    data: bgDetails,
-                    columns: Object.keys(bgDetails[0]).map(key => ({ title: key, data: key })),
-                    pageLength: 5,
-                    lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Tất cả"]],
-                    responsive: true,
-                    language: {
-                        url: 'https://cdn.datatables.net/plug-ins/1.10.24/i18n/Vietnamese.json'
-                    },
-                    dom: 'Bfrtip',
-                    buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
-                });
-            }
-
-            $('#detailModal').modal('show');
-
-            $('#detailModal').on('hidden.bs.modal', function (e) {
-                if ($.fn.DataTable.isDataTable('#bgDetailTable')) {
-                    $('#bgDetailTable').DataTable().destroy();
-                }
-            });
-        }
-
-        function displayDHTable(tableId, data) {
-            const table = $(`#${tableId}`);
-            table.empty();
-
-            if (data && data.length > 0) {
-                const headers = [...Object.keys(data[0]), 'Chi tiết'];
-                const tableData = data.map(row => {
-                    const rowData = headers.slice(0, -1).map(header => row[header] || '');
-                    rowData.push(`<button class="btn btn-primary btn-sm" onclick="showDHDetails('${row['SỐ ĐƠN HÀNG']}')"><i class="fas fa-eye"></i></button>`);
-                    return rowData;
-                });
-
-                if ($.fn.DataTable.isDataTable(`#${tableId}`)) {
-                    $(`#${tableId}`).DataTable().destroy();
-                }
-
-                $(`#${tableId}`).DataTable({
-                    data: tableData,
-                    columns: headers.map(header => ({ title: header })),
-                    responsive: true,
-                    language: {
-                        url: 'https://cdn.datatables.net/plug-ins/1.10.24/i18n/Vietnamese.json'
-                    },
-                    dom: 'Bfrtip',
-                    buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
-                });
-            } else {
-                table.append($('<p>').text('Không có dữ liệu'));
-                FuiToast.warning(`Không có dữ liệu`);
-            }
-        }
-
-        function showDHDetails(soDonHang) {
-            const dhDetails = sheetData.dhDetail.filter(detail => detail['SỐ ĐƠN HÀNG'] === soDonHang);
-            let modalContent = `
-        <div class="modal-header">
-            <h5 class="modal-title">Chi tiết Đơn Hàng: ${soDonHang}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-    `;
-
-            if (dhDetails.length > 0) {
-                modalContent += '<table id="dhDetailTable" class="fui-table-ui-basic-linh table-wrap" style="width:100%"></table>';
-            } else {
-                modalContent += '<p>Không có chi tiết cho đơn hàng này.</p>';
-            }
-
-            modalContent += '</div>';
-
-            $('#detailModal .modal-content').html(modalContent);
-
-            if (dhDetails.length > 0) {
-                $('#dhDetailTable').DataTable({
-                    data: dhDetails,
-                    columns: Object.keys(dhDetails[0]).map(key => ({ title: key, data: key })),
-                    pageLength: 5,
-                    lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Tất cả"]],
-                    responsive: true,
-                    language: {
-                        url: 'https://cdn.datatables.net/plug-ins/1.10.24/i18n/Vietnamese.json'
-                    },
-                    dom: 'Bfrtip',
-                    buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
-                });
-            }
-
-            $('#detailModal').modal('show');
-
-            $('#detailModal').on('hidden.bs.modal', function (e) {
-                if ($.fn.DataTable.isDataTable('#dhDetailTable')) {
-                    $('#dhDetailTable').DataTable().destroy();
-                }
-            });
-        }
-
-
-        document.addEventListener('DOMContentLoaded', function () {
-            fetchData();
-        });
-
-        // Giả sử sheetData đã được định nghĩa ở đâu đó trong code của bạn
-        function createInventoryReport(sheetData) {
-            const { packingList, pnkData } = sheetData;
-            const inventoryReport = [];
-
-            for (const item of packingList) {
-                const inventoryItem = {
-                    MÃ_KIỆN: item['MÃ KIỆN'] || '',
-                    TÊN_GỖ: item['TÊN GỖ'] || '',
-                    KHỐI_LƯỢNG_THỰC_TẾ: item['KHỐI LƯỢNG THỰC TẾ'] || '',
-                    SỐ_THANH_THỰC_TẾ: item['SỐ THANH THỰC TẾ'] || '',
-                    CHIỀU_DÀI_THỰC_TẾ: item['CHIỀU DÀI THỰC TẾ'] || '',
-                    CHIỀU_RỘNG_THỰC_TẾ: item['CHIỀU RỘNG THỰC TẾ'] || '',
-                    KHO_HIỆN_TẠI: "",
-                    TRẠNG_THÁI: "Đang về"
-                };
-
-                if (pnkData && pnkData.length > 0) {
-                    const relatedPnk = pnkData.filter(p => p.danhSáchKiện && p.danhSáchKiện.includes(item['MÃ KIỆN']));
-                    if (relatedPnk.length > 0) {
-                        const latestPnk = relatedPnk.reduce((a, b) => new Date(a.ngàyTháng) > new Date(b.ngàyTháng) ? a : b);
-                        if (latestPnk.loạiNghiệpVụ && latestPnk.loạiNghiệpVụ.startsWith("Nhập")) {
-                            inventoryItem.TRẠNG_THÁI = "Tồn kho";
-                            inventoryItem.KHO_HIỆN_TẠI = latestPnk.đếnKho || "";
-                        } else {
-                            inventoryItem.TRẠNG_THÁI = "Hết hàng";
+                        // Create table headers
+                        let headerHtml = '<thead><tr>';
+                        columns.forEach(column => {
+                            headerHtml += `<th>${column}</th>`;
+                        });
+                        if (detailConfigs && detailConfigs.length > 0) {
+                            headerHtml += '<th>Actions</th>';
                         }
+                        headerHtml += '</tr></thead>';
+                        table.innerHTML = headerHtml;
+
+                        // Create table body
+                        let bodyHtml = '<tbody>';
+                        tableData.forEach(rowData => {
+                            bodyHtml += '<tr>';
+                            columns.forEach(column => {
+                                bodyHtml += `<td>${rowData[column] || ''}</td>`;
+                            });
+                            if (detailConfigs && detailConfigs.length > 0) {
+                                bodyHtml += '<td><button class="btn btn-primary btn-sm detail-btn">Xem chi tiết</button></td>';
+                            }
+                            bodyHtml += '</tr>';
+                        });
+                        bodyHtml += '</tbody>';
+                        table.innerHTML += bodyHtml;
+
+                        // Initialize DataTable
+                        const dataTable = $(`#${tableId}`).DataTable({
+                            responsive: true,
+                            dom: 'Bfrtip',
+                            buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+                            language: {
+                                url: 'https://cdn.datatables.net/plug-ins/1.10.24/i18n/Vietnamese.json'
+                            },
+                        });
+
+                        // Add event listener for detail buttons
+                        if (detailConfigs && detailConfigs.length > 0) {
+                            $(`#${tableId} tbody`).on('click', 'button.detail-btn', function () {
+                                const rowData = dataTable.row($(this).closest('tr')).data();
+                                showDetails(detailConfigs, rowData);
+                            });
+                        }
+                    } else {
+                        table.innerHTML = '<tr><td colspan="' + columns.length + '">No data available</td></tr>';
                     }
                 }
-
-                inventoryReport.push(inventoryItem);
-            }
-
-            return inventoryReport;
+            });
         }
-        function displayInventoryReport(inventoryReport) {
-            const table = $('#inventoryTable');
-            if ($.fn.DataTable.isDataTable(table)) {
-                table.DataTable().destroy();
+
+        function showDetails(detailConfigs, parentRowData) {
+            const detailContent = document.getElementById('detailContent');
+            detailContent.innerHTML = '';
+
+            detailConfigs.forEach((detailConfig, index) => {
+                const allDetailData = getSpecificColumns(detailConfig.sheetId, detailConfig.sheetName, detailConfig.columns);
+                const detailData = allDetailData.filter(row => {
+                    return detailConfig.linkColumns.every(link => {
+                        const parentValue = parentRowData[link.parent];
+                        const childValue = row[link.child];
+                        return parentValue != null && childValue != null && parentValue.toString() === childValue.toString();
+                    });
+                });
+
+                const detailTitle = document.createElement('h3');
+                detailTitle.textContent = `${detailConfig.sheetName} Details`;
+                detailContent.appendChild(detailTitle);
+
+                const detailTable = document.createElement('table');
+                detailTable.className = 'table table-striped table-bordered';
+                detailTable.style.width = '100%';
+                detailContent.appendChild(detailTable);
+
+                // Initialize DataTable for detail table
+                $(detailTable).DataTable({
+                    data: detailData,
+                    columns: detailConfig.columns.map(column => ({ title: column, data: column })),
+                    responsive: true,
+                    dom: 'Bfrtip',
+                    buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+                    language: {
+                        url: 'https://cdn.datatables.net/plug-ins/1.10.24/i18n/Vietnamese.json'
+                    },
+                });
+
+                if (index < detailConfigs.length - 1) {
+                    detailContent.appendChild(document.createElement('hr'));
+                }
+            });
+
+            // Show the modal
+            var myModal = new bootstrap.Modal(document.getElementById('detailModal'));
+            myModal.show();
+        }
+
+        function updateChungTuDiKem(nghiepVu) {
+            const chungTuSelect = document.getElementById('chungTuDiKem');
+            chungTuSelect.innerHTML = ''; // Clear existing options
+
+            let options = [];
+
+            if (allSheetData) {
+                switch (nghiepVu) {
+                    case 'Nhập Mua Hàng':
+                        options = getSheetData('1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998', 'PACKING LIST')
+                            .map(row => row['INVOICE'])
+                            .filter((value, index, self) => self.indexOf(value) === index && value);
+                        break;
+                    case 'Xuất Bán':
+                        options = getSheetData('1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998', 'ĐH')
+                            .map(row => row['SỐ ĐƠN HÀNG'])
+                            .filter((value, index, self) => self.indexOf(value) === index && value);
+                        break;
+                    case 'Xuất Tạm':
+                        options = getSheetData('1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998', 'BG')
+                            .map(row => row['SỐ BÁO GIÁ'])
+                            .filter((value, index, self) => self.indexOf(value) === index && value);
+                        break;
+                    case 'Nhập Trả Hàng':
+                        options = getSheetData('1tzyxVXDZyk7FQtYm8nFYskisu5gdAf2QoV3SoDCzIRY', 'PNK')
+                            .filter(row => row['NGHIỆP VỤ'] === 'Xuất Bán')
+                            .map(row => row['SỐ PHIẾU'])
+                            .filter((value, index, self) => self.indexOf(value) === index && value);
+                        break;
+                    case 'Xuất Chuyển Kho':
+                        options = getSheetData('1tzyxVXDZyk7FQtYm8nFYskisu5gdAf2QoV3SoDCzIRY', 'PNK')
+                            .filter(row => row['NGHIỆP VỤ'].includes('Nhập'))
+                            .map(row => row['SỐ PHIẾU'])
+                            .filter((value, index, self) => self.indexOf(value) === index && value);
+                        break;
+                    case 'Nhập Chuyển Kho':
+                        options = getSheetData('1tzyxVXDZyk7FQtYm8nFYskisu5gdAf2QoV3SoDCzIRY', 'PNK')
+                            .filter(row => row['NGHIỆP VỤ'] === 'Xuất Chuyển Kho')
+                            .map(row => row['SỐ PHIẾU'])
+                            .filter((value, index, self) => self.indexOf(value) === index && value);
+                        break;
+                    // Thêm các trường hợp khác nếu cần
+                }
             }
 
-            table.DataTable({
-                data: inventoryReport,
+            options.forEach(option => {
+                const optionElement = document.createElement('option');
+                optionElement.value = option;
+                optionElement.textContent = option;
+                chungTuSelect.appendChild(optionElement);
+            });
+        }
+        function initializePNKForm() {
+            if (allSheetData) {
+                updateChungTuDiKem(document.getElementById('nghiepVu').value);
+                document.getElementById('nghiepVu').addEventListener('change', function () {
+                    updateChungTuDiKem(this.value);
+                    updateSelectedPackingList();
+                });
+                document.getElementById('chungTuDiKem').addEventListener('change', updateSelectedPackingList);
+            } else {
+                // If data is not ready, wait for it
+                setTimeout(initializePNKForm, 100);
+            }
+        }
+
+        document.getElementById('chungTuDiKem').addEventListener('change', updateSelectedPackingList);
+        function updateSelectedPackingList() {
+            const chungTuDiKem = document.getElementById('chungTuDiKem').value;
+            const nghiepVu = document.getElementById('nghiepVu').value;
+
+            let packingListData = [];
+
+            if (allSheetData) {
+                const packingListSheet = allSheetData['1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998']['PACKING LIST'];
+
+                switch (nghiepVu) {
+                    case 'Nhập Mua Hàng':
+                        packingListData = packingListSheet.filter(row => row['INVOICE'] === chungTuDiKem);
+                        break;
+                    case 'Xuất Bán':
+                        const donHangSheet = allSheetData['1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998']['ĐH_DETAIL'];
+                        const maKienList = donHangSheet.filter(row => row['SỐ ĐƠN HÀNG'] === chungTuDiKem).map(row => row['MÃ KIỆN']);
+                        packingListData = packingListSheet.filter(row => maKienList.includes(row['MÃ KIỆN']));
+                        break;
+                    case 'Xuất Tạm':
+                        const baoGiaSheet = allSheetData['1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998']['BG_DETAIL'];
+                        const maKienListBG = baoGiaSheet.filter(row => row['SỐ BÁO GIÁ'] === chungTuDiKem).map(row => row['MÃ KIỆN']);
+                        packingListData = packingListSheet.filter(row => maKienListBG.includes(row['MÃ KIỆN']));
+                        break;
+                    // Thêm các trường hợp khác nếu cần
+                }
+            }
+
+            displaySelectedPackingList(packingListData);
+        }
+        function displaySelectedPackingList(data) {
+            const table = document.getElementById('selectedPackingListTable');
+
+            if ($.fn.DataTable.isDataTable('#selectedPackingListTable')) {
+                $('#selectedPackingListTable').DataTable().destroy();
+            }
+
+            if (data && data.length > 0) {
+                const columns = ['CHỌN', 'MÃ KIỆN', 'KHỐI LƯỢNG THỰC TẾ', 'SỐ THANH THỰC TẾ', 'CHIỀU DÀI THỰC TẾ', 'CHIỀU RỘNG THỰC TẾ'];
+
+                let headerHtml = '<thead><tr>';
+                columns.forEach(column => {
+                    headerHtml += `<th>${column}</th>`;
+                });
+                headerHtml += '</tr></thead>';
+
+                let bodyHtml = '<tbody>';
+                data.forEach(row => {
+                    bodyHtml += '<tr>';
+                    columns.forEach(column => {
+                        if (column === 'CHỌN') {
+                            bodyHtml += `<td><input type="checkbox" class="select-row" data-ma-kien="${row['MÃ KIỆN']}" checked></td>`;
+                        } else {
+                            bodyHtml += `<td>${row[column] || ''}</td>`;
+                        }
+                    });
+                    bodyHtml += '</tr>';
+                });
+                bodyHtml += '</tbody>';
+
+                table.innerHTML = headerHtml + bodyHtml;
+
+                if (data.length > 0) {
+                    $(table).DataTable({
+                        responsive: true,
+                        dom: 'Bfrtip',
+                        buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+                        language: {
+                            url: 'https://cdn.datatables.net/plug-ins/1.10.24/i18n/Vietnamese.json'
+                        },
+                    });
+                }
+            } else {
+                table.innerHTML = '<tr><td colspan="6">Không có dữ liệu</td></tr>';
+            }
+        }
+        document.getElementById('submitPNK').addEventListener('click', function (e) {
+            e.preventDefault();
+            submitPNK();
+        });
+        function submitPNK() {
+            const nghiepVu = document.getElementById('nghiepVu').value;
+            const soPhieu = document.getElementById('soPhieu').value;
+            const ngayThang = document.getElementById('ngayThang').value;
+            const tuDau = document.getElementById('tuDau').value;
+            const denDau = document.getElementById('denDau').value;
+            const dienGiai = document.getElementById('dienGiai').value;
+            const chungTuDiKem = document.getElementById('chungTuDiKem').value;
+
+            const selectedMaKien = [];
+            document.querySelectorAll('.select-row:checked').forEach(checkbox => {
+                selectedMaKien.push(checkbox.getAttribute('data-ma-kien'));
+            });
+
+            if (selectedMaKien.length === 0) {
+                FuiToast.error('Vui lòng chọn ít nhất một mã kiện.');
+                return;
+            }
+
+            const data = selectedMaKien.map(maKien => ({
+                'NGHIỆP VỤ': nghiepVu,
+                'SỐ PHIẾU': soPhieu,
+                'NGÀY THÁNG': ngayThang,
+                'TỪ ĐÂU': tuDau,
+                'ĐẾN ĐÂU': denDau,
+                'DIỄN GIẢI': dienGiai,
+                'CHỨNG TỪ ĐI KÈM': chungTuDiKem,
+                'MÃ KIỆN': maKien
+            }));
+
+            const postData = {
+                action: 'add',
+                sheetId: '1tzyxVXDZyk7FQtYm8nFYskisu5gdAf2QoV3SoDCzIRY',
+                sheetName: 'PNK',
+                data: data
+            };
+
+            const resPromise = fetch(API_URL, {
+                method: 'POST',
+
+                body: JSON.stringify(postData)
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        return result;
+                    } else {
+                        throw new Error(result.message);
+                    }
+                });
+
+            FuiToast.promise(
+                resPromise,
+                {
+                    loading: 'Đang thêm dữ liệu mới...',
+                    success: (result) => {
+                        console.log(result);
+                        // Refresh data or clear form as needed
+                        clearForm();
+                        updateSelectedPackingList();
+                        return 'Thêm mới thành công!';
+                    },
+                    error: 'Thêm mới thất bại. Vui lòng kiểm tra lại!',
+                },
+                {
+                    isClose: true
+                }
+            );
+        }
+
+        function clearForm() {
+            document.getElementById('soPhieu').value = '';
+            document.getElementById('ngayThang').value = '';
+            document.getElementById('dienGiai').value = '';
+            // Clear other fields as needed
+
+            // Uncheck all checkboxes
+            document.querySelectorAll('.select-row:checked').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        }
+
+        function createGroupTable() {
+            console.log('Creating group table...');
+            const packingListData = getSheetData('1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998', 'PACKING LIST');
+            console.log('Packing List Data:', packingListData);
+
+            // Group data
+            const groupedData = packingListData.reduce((acc, row) => {
+                const key = row['TÊN GỖ'];
+                if (!acc[key]) {
+                    acc[key] = {
+                        'TÊN GỖ': key,
+                        'KHỐI LƯỢNG THỰC TẾ': 0,
+                        'SỐ THANH THỰC TẾ': 0,
+                        'DETAILS': []
+                    };
+                }
+                acc[key]['KHỐI LƯỢNG THỰC TẾ'] += parseFloat(row['KHỐI LƯỢNG THỰC TẾ'] || 0);
+                acc[key]['SỐ THANH THỰC TẾ'] += parseInt(row['SỐ THANH THỰC TẾ'] || 0);
+                acc[key]['DETAILS'].push(row);
+                return acc;
+            }, {});
+
+            const groupData = Object.values(groupedData);
+            console.log('Grouped Data:', groupData);
+
+            const dataTable = $('#groupTable').DataTable({
+                data: groupData,
                 columns: [
-                    { data: 'MÃ_KIỆN', title: 'MÃ KIỆN' },
-                    { data: 'TÊN_GỖ', title: 'TÊN GỖ' },
-                    { data: 'KHỐI_LƯỢNG_THỰC_TẾ', title: 'KHỐI LƯỢNG THỰC TẾ' },
-                    { data: 'SỐ_THANH_THỰC_TẾ', title: 'SỐ THANH THỰC TẾ' },
-                    { data: 'CHIỀU_DÀI_THỰC_TẾ', title: 'CHIỀU DÀI THỰC TẾ' },
-                    { data: 'CHIỀU_RỘNG_THỰC_TẾ', title: 'CHIỀU RỘNG THỰC TẾ' },
-                    { data: 'KHO_HIỆN_TẠI', title: 'KHO HIỆN TẠI' },
-                    { data: 'TRẠNG_THÁI', title: 'TRẠNG THÁI' }
+                    {
+                        className: 'details-control',
+                        orderable: false,
+                        data: null,
+                        defaultContent: '<button class="btn btn-info btn-sm">Chi tiết</button>'
+                    },
+                    { data: 'TÊN GỖ' },
+                    {
+                        data: 'KHỐI LƯỢNG THỰC TẾ',
+                        render: function (data, type, row) {
+                            return type === 'display' ? data.toFixed(2) : data;
+                        }
+                    },
+                    { data: 'SỐ THANH THỰC TẾ' }
                 ],
                 responsive: true,
+                dom: 'Bfrtip',
+                buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
                 language: {
                     url: 'https://cdn.datatables.net/plug-ins/1.10.24/i18n/Vietnamese.json'
-                },
-                dom: '<"top"Bfl>rt<"bottom"ip><"clear">',
-                buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Tất cả"]],
-                pageLength: 10,
-                order: [[0, 'asc']], // Sắp xếp theo cột đầu tiên (MÃ KIỆN) tăng dần
-                searching: true,
-                info: true,
-                paging: true
-            });
-        }
-        function updateInventoryReport() {
-            const inventoryReport = createInventoryReport(sheetData);
-            displayInventoryReport(inventoryReport);
-        }
-        // Khi tab Báo Cáo Tồn Kho được chọn
-        document.getElementById('inventory-tab').addEventListener('shown.bs.tab', function (e) {
-            updateInventoryReport();
-        });
-
-    </script>
-    <!-- Modal for details -->
-    <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <!-- Content will be dynamically inserted here -->
-            </div>
-        </div>
-    </div>
-    <div class="modal fade" id="detailModal1" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
-        <div class="modal-dialog ">
-            <div class="modal-content">
-                <!-- Content will be dynamically inserted here -->
-            </div>
-        </div>
-    </div>
-
-    <script>
-        $('#detailModal').on('show.bs.modal', function () {
-            setTimeout(function () {
-                var modalBody = $('#detailModal .modal-body');
-                var modalDialog = $('#detailModal .modal-dialog');
-                var windowHeight = $(window).height();
-                var windowWidth = $(window).width();
-
-                modalBody.css('max-height', (windowHeight * 0.8) + 'px');
-
-                var contentWidth = modalBody.prop('scrollWidth');
-                var maxWidth = windowWidth * 0.9;
-
-                if (contentWidth > maxWidth) {
-                    modalDialog.css('width', maxWidth + 'px');
-                } else {
-                    modalDialog.css('width', 'fit-content');
                 }
-            }, 150);
-        });
+            });
+
+            // Thêm event listener cho chi tiết
+            $('#groupTable tbody').on('click', 'td.details-control', function () {
+                var tr = $(this).closest('tr');
+                var row = dataTable.row(tr);
+
+                if (row.child.isShown()) {
+                    row.child.hide();
+                    tr.removeClass('shown');
+                } else {
+                    row.child(formatDetails(row.data())).show();
+                    tr.addClass('shown');
+                }
+            });
+
+            console.log('Group table created.');
+        }
+
+        function createInventoryTable() {
+            console.log('Creating inventory table...');
+            const packingListData = getSheetData('1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998', 'PACKING LIST');
+            const pnkData = getSheetData('1tzyxVXDZyk7FQtYm8nFYskisu5gdAf2QoV3SoDCzIRY', 'PNK');
+
+            const inventoryData = packingListData.map(row => {
+                const maKien = row['MÃ KIỆN'];
+                const relatedPNK = pnkData
+                    .filter(pnk => pnk['MÃ KIỆN'] === maKien)
+                    .sort((a, b) => new Date(b['NGÀY THÁNG']) - new Date(a['NGÀY THÁNG']));
+
+                let trangThaiKho = 'ĐANG VỀ';
+                let khoGiu = '';
+
+                if (relatedPNK.length > 0) {
+                    const latestPNK = relatedPNK[0];
+                    if (latestPNK['NGHIỆP VỤ'].includes('Nhập')) {
+                        trangThaiKho = 'TỒN KHO';
+                    } else if (latestPNK['NGHIỆP VỤ'].includes('Xuất')) {
+                        trangThaiKho = 'HẾT HÀNG';
+                    }
+                    khoGiu = latestPNK['ĐẾN ĐÂU'];
+                }
+
+                return {
+                    ...row,
+                    'Trạng thái kho': trangThaiKho,
+                    'Kho giữ': khoGiu
+                };
+            });
+
+            $('#inventoryTable').DataTable({
+                data: inventoryData,
+                columns: [
+                    { data: 'TỜ KHAI' },
+                    { data: 'NGÀY TỜ KHAI' },
+                    { data: 'ĐƠN GIÁ (USD)' },
+                    { data: 'ĐƠN GIÁ (EUR)' },
+                    { data: 'TỶ GIÁ' },
+                    { data: 'FSC' },
+                    { data: 'XUẤT XỨ' },
+                    { data: 'INVOICE' },
+                    { data: 'TÊN NHÀ CUNG CẤP' },
+                    { data: 'SỐ CONTAINER' },
+                    { data: 'TÊN GỖ' },
+                    { data: 'MÃ KIỆN' },
+                    { data: 'KHỐI LƯỢNG THỰC TẾ' },
+                    { data: 'SỐ THANH THỰC TẾ' },
+                    { data: 'CHIỀU DÀI THỰC TẾ' },
+                    { data: 'CHIỀU RỘNG THỰC TẾ' },
+                    { data: 'MÃ KIỆN TRÊN PL' },
+                    { data: 'Trạng thái kho' },
+                    { data: 'Kho giữ' }
+                ],
+                responsive: true,
+                dom: 'Bfrtip',
+                buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.10.24/i18n/Vietnamese.json'
+                }
+            });
+
+            console.log('Inventory table created.');
+        }
+
+        function formatDetails(d) {
+            console.log('Formatting details for:', d);
+            var table = '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">';
+            table += '<tr><th>MÃ KIỆN</th><th>KHO GIỮ</th><th>KHỐI LƯỢNG THỰC TẾ</th><th>SỐ THANH THỰC TẾ</th><th>CHIỀU DÀI THỰC TẾ</th><th>CHIỀU RỘNG THỰC TẾ</th><th>MÃ KIỆN TRÊN PL</th></tr>';
+
+            d.DETAILS.forEach(function (detail) {
+                table += '<tr>';
+                table += '<td>' + (detail['MÃ KIỆN'] || '') + '</td>';
+                table += '<td>' + (detail['KHO GIỮ'] || '') + '</td>';
+                table += '<td>' + (detail['KHỐI LƯỢNG THỰC TẾ'] || '') + '</td>';
+                table += '<td>' + (detail['SỐ THANH THỰC TẾ'] || '') + '</td>';
+                table += '<td>' + (detail['CHIỀU DÀI THỰC TẾ'] || '') + '</td>';
+                table += '<td>' + (detail['CHIỀU RỘNG THỰC TẾ'] || '') + '</td>';
+                table += '<td>' + (detail['MÃ KIỆN TRÊN PL'] || '') + '</td>';
+                table += '</tr>';
+            });
+
+            table += '</table>';
+
+            return table;
+        }
+
+        document.addEventListener('DOMContentLoaded', getAllData);
     </script>
+
+
+
 </body>
 
 </html>
