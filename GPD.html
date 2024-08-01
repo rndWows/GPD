@@ -111,11 +111,23 @@
                                         <label for="ngayThang" class="form-label">Ngày tháng:</label>
                                         <input type="date" class="form-control" id="ngayThang" name="ngayThang"
                                             required>
+                                        <script>
+                                            // Use moment to get the current date and format it to YYYY-MM-DD
+                                            let date = new Date().toLocaleDateString();
+
+                                            // Set the value of the date input element
+                                            document.getElementById("ngayThang").value = date;
+                                        </script>
                                     </div>
                                     <div class="col-md-3 mb-3">
                                         <label for="tuDau" class="form-label">Từ kho:</label>
                                         <select class="form-select" id="tuDau" name="tuDau" required>
                                             <!-- Options will be populated dynamically -->
+                                            <option value="Kho Nhà cung cấp">Kho Nhà cung cấp</option>
+                                            <option value="Kho Hoàng Lâm">Kho Hoàng Lâm</option>
+                                            <option value="Kho An vũ">Kho An vũ</option>
+                                            <option value="Kho khách hàng">Kho khách hàng</option>
+                                     
                                         </select>
                                     </div>
                                 </div>
@@ -125,6 +137,11 @@
                                         <label for="denDau" class="form-label">Đến kho:</label>
                                         <select class="form-select" id="denDau" name="denDau" required>
                                             <!-- Options will be populated dynamically -->
+                                            <option value="Kho Hoàng Lâm">Kho Hoàng Lâm</option>
+                                            <option value="Kho Nhà cung cấp">Kho Nhà cung cấp</option>
+                                    
+                                            <option value="Kho An vũ">Kho An vũ</option>
+                                            <option value="Kho khách hàng">Kho khách hàng</option>
                                         </select>
                                     </div>
                                     <div class="col-md-9 mb-3">
@@ -158,7 +175,7 @@
                 <div class="card">
                     <div class="card-body">
                         <h3>Bảng Nhóm</h3>
-                        <table id="groupTable" class="display" style="width:100%">
+                        <table id="groupTable" class="fui-table-ui-basic-linh table-wrap" style="width: 100%;">
                             <thead>
                                 <tr>
                                     <th></th>
@@ -177,7 +194,7 @@
                 <div class="card mt-4">
                     <div class="card-body">
                         <h3>Bảng Tồn Kho</h3>
-                        <table id="inventoryTable" class="display" style="width:100%">
+                        <table id="inventoryTable" class="fui-table-ui-basic-linh table-wrap" style="width: 100%;">
                             <thead>
                                 <tr>
                                     <th>TỜ KHAI</th>
@@ -458,7 +475,6 @@
                 {
                     loading: 'Đang tải dữ liệu từ server...',
                     success: (data) => {
-                        console.log(data);
                         initializePNKForm();
 
                         return 'Tải dữ liệu thành công!';
@@ -473,12 +489,10 @@
 
         function getSpecificColumns(sheetId, sheetName, columnNames) {
             try {
-                console.log(`Getting data for sheetId: ${sheetId}, sheetName: ${sheetName}`);
-                console.log('Requested columns:', columnNames);
+
 
                 if (allSheetData && allSheetData[sheetId] && allSheetData[sheetId][sheetName]) {
                     const sheetData = allSheetData[sheetId][sheetName];
-                    console.log('Raw sheet data:', sheetData);
 
                     const filteredData = sheetData.map(row => {
                         const filteredRow = {};
@@ -492,7 +506,6 @@
                         return filteredRow;
                     });
 
-                    console.log('Filtered data:', filteredData);
                     return filteredData;
                 } else {
                     console.error(`Data not found for sheetId: ${sheetId}, sheetName: ${sheetName}`);
@@ -611,7 +624,6 @@
             var myModal = new bootstrap.Modal(document.getElementById('detailModal'));
             myModal.show();
         }
-
         function updateChungTuDiKem(nghiepVu) {
             const chungTuSelect = document.getElementById('chungTuDiKem');
             chungTuSelect.innerHTML = ''; // Clear existing options
@@ -619,19 +631,33 @@
             let options = [];
 
             if (allSheetData) {
+                const inventoryData = createInventoryData(); // Hàm này sẽ tạo dữ liệu tồn kho
+
                 switch (nghiepVu) {
                     case 'Nhập Mua Hàng':
                         options = getSheetData('1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998', 'PACKING LIST')
+                            .filter(row => {
+                                const inventory = inventoryData.find(inv => inv['MÃ KIỆN'] === row['MÃ KIỆN']);
+                                return inventory && ['ĐANG VỀ', 'ĐÃ CÓ BÁO GIÁ'].includes(inventory['Trạng thái kho']);
+                            })
                             .map(row => row['INVOICE'])
                             .filter((value, index, self) => self.indexOf(value) === index && value);
                         break;
                     case 'Xuất Bán':
                         options = getSheetData('1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998', 'ĐH')
+                            .filter(row => {
+                                const inventory = inventoryData.find(inv => inv['MÃ KIỆN'] === row['MÃ KIỆN']);
+                                return inventory && inventory['Trạng thái kho'] === 'ĐÃ LÊN ĐƠN CHƯA XUẤT';
+                            })
                             .map(row => row['SỐ ĐƠN HÀNG'])
                             .filter((value, index, self) => self.indexOf(value) === index && value);
                         break;
                     case 'Xuất Tạm':
                         options = getSheetData('1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998', 'BG')
+                            .filter(row => {
+                                const inventory = inventoryData.find(inv => inv['MÃ KIỆN'] === row['MÃ KIỆN']);
+                                return inventory && ['ĐANG VỀ', 'ĐÃ CÓ BÁO GIÁ', 'ĐÃ LÊN ĐƠN CHƯA XUẤT'].includes(inventory['Trạng thái kho']);
+                            })
                             .map(row => row['SỐ BÁO GIÁ'])
                             .filter((value, index, self) => self.indexOf(value) === index && value);
                         break;
@@ -642,18 +668,18 @@
                             .filter((value, index, self) => self.indexOf(value) === index && value);
                         break;
                     case 'Xuất Chuyển Kho':
-                        options = getSheetData('1tzyxVXDZyk7FQtYm8nFYskisu5gdAf2QoV3SoDCzIRY', 'PNK')
-                            .filter(row => row['NGHIỆP VỤ'].includes('Nhập'))
-                            .map(row => row['SỐ PHIẾU'])
-                            .filter((value, index, self) => self.indexOf(value) === index && value);
-                        break;
                     case 'Nhập Chuyển Kho':
                         options = getSheetData('1tzyxVXDZyk7FQtYm8nFYskisu5gdAf2QoV3SoDCzIRY', 'PNK')
-                            .filter(row => row['NGHIỆP VỤ'] === 'Xuất Chuyển Kho')
+                            .filter(row => {
+                                if (nghiepVu === 'Xuất Chuyển Kho') {
+                                    const inventory = inventoryData.find(inv => inv['MÃ KIỆN'] === row['MÃ KIỆN']);
+                                    return inventory && inventory['Trạng thái kho'] === 'TỒN KHO' && inventory['Kho đang ở'] === row['TỪ ĐÂU'];
+                                }
+                                return row['NGHIỆP VỤ'] === 'Xuất Chuyển Kho';
+                            })
                             .map(row => row['SỐ PHIẾU'])
                             .filter((value, index, self) => self.indexOf(value) === index && value);
                         break;
-                    // Thêm các trường hợp khác nếu cần
                 }
             }
 
@@ -664,6 +690,60 @@
                 chungTuSelect.appendChild(optionElement);
             });
         }
+        function createInventoryData() {
+            const packingListData = getSheetData('1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998', 'PACKING LIST');
+            const pnkData = getSheetData('1tzyxVXDZyk7FQtYm8nFYskisu5gdAf2QoV3SoDCzIRY', 'PNK');
+            const dhDetailData = getSheetData('1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998', 'ĐH_DETAIL');
+            const bgDetailData = getSheetData('1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998', 'BG_DETAIL');
+
+            return packingListData.map(row => {
+                const maKien = row['MÃ KIỆN'];
+                const relatedPNK = pnkData
+                    .filter(pnk => pnk['MÃ KIỆN'] === maKien)
+                    .sort((a, b) => new Date(b['NGÀY THÁNG']) - new Date(a['NGÀY THÁNG']));
+
+                let trangThaiKho = 'ĐANG VỀ';
+                let khoHienTai = '';
+
+                if (relatedPNK.length > 0) {
+                    const latestPNK = relatedPNK[0];
+                    if (latestPNK['NGHIỆP VỤ'].includes('Nhập')) {
+                        const inDHDetail = dhDetailData.some(dh => dh['MÃ KIỆN'] === maKien);
+                        if (inDHDetail) {
+                            const hasXuatPNK = relatedPNK.some(pnk => pnk['NGHIỆP VỤ'].includes('Xuất'));
+                            trangThaiKho = hasXuatPNK ? 'HẾT HÀNG' : 'ĐÃ LÊN ĐƠN CHƯA XUẤT';
+                        } else {
+                            const inBGDetail = bgDetailData.some(bg => bg['MÃ KIỆN'] === maKien);
+                            trangThaiKho = inBGDetail ? 'ĐÃ CÓ BÁO GIÁ' : 'TỒN KHO';
+                        }
+                        khoHienTai = latestPNK['ĐẾN ĐÂU'];
+                    } else if (latestPNK['NGHIỆP VỤ'].includes('Xuất')) {
+                        trangThaiKho = 'HẾT HÀNG';
+                        const latestNhap = relatedPNK.find(pnk => pnk['NGHIỆP VỤ'].includes('Nhập'));
+                        khoHienTai = latestNhap ? latestNhap['ĐẾN ĐÂU'] : 'Không xác định';
+                    }
+                } else {
+                    const inDHDetail = dhDetailData.some(dh => dh['MÃ KIỆN'] === maKien);
+                    if (inDHDetail) {
+                        trangThaiKho = 'ĐÃ LÊN ĐƠN CHƯA NHẬP';
+                    } else {
+                        const inBGDetail = bgDetailData.some(bg => bg['MÃ KIỆN'] === maKien);
+                        if (inBGDetail) {
+                            trangThaiKho = 'ĐÃ CÓ BÁO GIÁ';
+                        }
+                    }
+                }
+
+                return {
+                    ...row,
+                    'Trạng thái kho': trangThaiKho,
+                    'Kho đang ở': khoHienTai
+                };
+            });
+        }
+
+
+
         function initializePNKForm() {
             if (allSheetData) {
                 updateChungTuDiKem(document.getElementById('nghiepVu').value);
@@ -814,8 +894,6 @@
                 {
                     loading: 'Đang thêm dữ liệu mới...',
                     success: (result) => {
-                        console.log(result);
-                        // Refresh data or clear form as needed
                         clearForm();
                         updateSelectedPackingList();
                         return 'Thêm mới thành công!';
@@ -841,9 +919,8 @@
         }
 
         function createGroupTable() {
-            console.log('Creating group table...');
             const packingListData = getSheetData('1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998', 'PACKING LIST');
-            console.log('Packing List Data:', packingListData);
+
 
             // Group data
             const groupedData = packingListData.reduce((acc, row) => {
@@ -863,7 +940,6 @@
             }, {});
 
             const groupData = Object.values(groupedData);
-            console.log('Grouped Data:', groupData);
 
             const dataTable = $('#groupTable').DataTable({
                 data: groupData,
@@ -905,13 +981,14 @@
                 }
             });
 
-            console.log('Group table created.');
         }
 
+
         function createInventoryTable() {
-            console.log('Creating inventory table...');
             const packingListData = getSheetData('1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998', 'PACKING LIST');
             const pnkData = getSheetData('1tzyxVXDZyk7FQtYm8nFYskisu5gdAf2QoV3SoDCzIRY', 'PNK');
+            const dhDetailData = getSheetData('1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998', 'ĐH_DETAIL');
+            const bgDetailData = getSheetData('1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998', 'BG_DETAIL');
 
             const inventoryData = packingListData.map(row => {
                 const maKien = row['MÃ KIỆN'];
@@ -920,22 +997,43 @@
                     .sort((a, b) => new Date(b['NGÀY THÁNG']) - new Date(a['NGÀY THÁNG']));
 
                 let trangThaiKho = 'ĐANG VỀ';
-                let khoGiu = '';
+                let khoHienTai = '';
 
                 if (relatedPNK.length > 0) {
                     const latestPNK = relatedPNK[0];
                     if (latestPNK['NGHIỆP VỤ'].includes('Nhập')) {
-                        trangThaiKho = 'TỒN KHO';
+                        const inDHDetail = dhDetailData.some(dh => dh['MÃ KIỆN'] === maKien);
+                        if (inDHDetail) {
+                            const hasXuatPNK = relatedPNK.some(pnk => pnk['NGHIỆP VỤ'].includes('Xuất'));
+                            trangThaiKho = hasXuatPNK ? 'HẾT HÀNG' : 'ĐÃ LÊN ĐƠN CHƯA XUẤT';
+                        } else {
+                            const inBGDetail = bgDetailData.some(bg => bg['MÃ KIỆN'] === maKien);
+                            trangThaiKho = inBGDetail ? 'ĐÃ CÓ BÁO GIÁ' : 'TỒN KHO';
+                        }
+                        khoHienTai = latestPNK['ĐẾN ĐÂU'];
                     } else if (latestPNK['NGHIỆP VỤ'].includes('Xuất')) {
                         trangThaiKho = 'HẾT HÀNG';
+                        // Tìm phiếu nhập gần nhất trước phiếu xuất này
+                        const latestNhap = relatedPNK.find(pnk => pnk['NGHIỆP VỤ'].includes('Nhập'));
+                        khoHienTai = latestNhap ? latestNhap['ĐẾN ĐÂU'] : 'Không xác định';
                     }
-                    khoGiu = latestPNK['ĐẾN ĐÂU'];
+                } else {
+                    // Kiểm tra nếu không có PNK nhưng có trong đơn hàng hoặc báo giá
+                    const inDHDetail = dhDetailData.some(dh => dh['MÃ KIỆN'] === maKien);
+                    if (inDHDetail) {
+                        trangThaiKho = 'ĐÃ LÊN ĐƠN CHƯA NHẬP';
+                    } else {
+                        const inBGDetail = bgDetailData.some(bg => bg['MÃ KIỆN'] === maKien);
+                        if (inBGDetail) {
+                            trangThaiKho = 'ĐÃ CÓ BÁO GIÁ';
+                        }
+                    }
                 }
 
                 return {
                     ...row,
                     'Trạng thái kho': trangThaiKho,
-                    'Kho giữ': khoGiu
+                    'Kho đang ở': khoHienTai
                 };
             });
 
@@ -960,7 +1058,7 @@
                     { data: 'CHIỀU RỘNG THỰC TẾ' },
                     { data: 'MÃ KIỆN TRÊN PL' },
                     { data: 'Trạng thái kho' },
-                    { data: 'Kho giữ' }
+                    { data: 'Kho đang ở' }
                 ],
                 responsive: true,
                 dom: 'Bfrtip',
@@ -969,12 +1067,10 @@
                     url: 'https://cdn.datatables.net/plug-ins/1.10.24/i18n/Vietnamese.json'
                 }
             });
-
-            console.log('Inventory table created.');
         }
 
+
         function formatDetails(d) {
-            console.log('Formatting details for:', d);
             var table = '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">';
             table += '<tr><th>MÃ KIỆN</th><th>KHO GIỮ</th><th>KHỐI LƯỢNG THỰC TẾ</th><th>SỐ THANH THỰC TẾ</th><th>CHIỀU DÀI THỰC TẾ</th><th>CHIỀU RỘNG THỰC TẾ</th><th>MÃ KIỆN TRÊN PL</th></tr>';
 
@@ -994,7 +1090,43 @@
 
             return table;
         }
+        document.addEventListener('DOMContentLoaded', function () {
+            const nghiepVuSelect = document.getElementById('nghiepVu');
+            const soPhieuInput = document.getElementById('soPhieu');
+            const ngayThangInput = document.getElementById('ngayThang');
 
+            function generateSoPhieu() {
+                const now = new Date();
+                const prefix = nghiepVuSelect.value.split(' ').map(word => word[0]).join('');
+                const dateStr = now.toLocaleDateString('en-GB').replace(/\//g, '');
+                const hourStr = String(now.getHours()).padStart(2, '0');
+                const randomStr = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+                return `${prefix}-${dateStr}-${hourStr}-${randomStr}`;
+            }
+
+            function setCurrentDate() {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                ngayThangInput.value = `${year}-${month}-${day}`;
+            }
+
+            nghiepVuSelect.addEventListener('change', function () {
+                soPhieuInput.value = generateSoPhieu();
+            });
+
+            // Set initial values
+            setCurrentDate();
+            soPhieuInput.value = generateSoPhieu();
+
+            // Regenerate số phiếu every minute to ensure unique timestamp and random number
+            setInterval(() => {
+                if (document.activeElement !== soPhieuInput) {
+                    soPhieuInput.value = generateSoPhieu();
+                }
+            }, 60000); // 60000 ms = 1 minute
+        });
         document.addEventListener('DOMContentLoaded', getAllData);
     </script>
 
