@@ -18,7 +18,6 @@
 
 <body>
     <div id="fui-toast"></div>
-
     <div id="content" class="">
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
@@ -644,10 +643,10 @@
                             .filter((value, index, self) => self.indexOf(value) === index && value);
                         break;
                     case 'Xuất Bán':
-                        options = getSheetData('1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998', 'ĐH')
+                        options = getSheetData('1Ysy5_9lkDqbb5ClA6E-f9uR8SYW7NBUHdM7QsQ7J998', 'ĐH_DETAIL')
                             .filter(row => {
                                 const inventory = inventoryData.find(inv => inv['MÃ KIỆN'] === row['MÃ KIỆN']);
-                                return inventory && inventory['Trạng thái kho'] === 'ĐÃ LÊN ĐƠN CHƯA XUẤT';
+                                return inventory && ['TỒN KHO', 'ĐÃ LÊN ĐƠN CHƯA NHẬP', 'ĐÃ LÊN ĐƠN CHƯA XUẤT'].includes(inventory['Trạng thái kho']);
                             })
                             .map(row => row['SỐ ĐƠN HÀNG'])
                             .filter((value, index, self) => self.indexOf(value) === index && value);
