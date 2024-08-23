@@ -126,7 +126,7 @@
                                             <option value="Kho Hoàng Lâm">Kho Hoàng Lâm</option>
                                             <option value="Kho An Phu">Kho An Phu</option>
                                             <option value="Kho khách hàng">Kho khách hàng</option>
-                                     
+
                                         </select>
                                     </div>
                                 </div>
@@ -138,7 +138,7 @@
                                             <!-- Options will be populated dynamically -->
                                             <option value="Kho Hoàng Lâm">Kho Hoàng Lâm</option>
                                             <option value="Kho Nhà cung cấp">Kho Nhà cung cấp</option>
-                                    
+
                                             <option value="Kho An Phu">Kho An Phu</option>
                                             <option value="Kho khách hàng">Kho khách hàng</option>
                                         </select>
@@ -488,10 +488,9 @@
 
         function getSpecificColumns(sheetId, sheetName, columnNames) {
             try {
-
-
                 if (allSheetData && allSheetData[sheetId] && allSheetData[sheetId][sheetName]) {
                     const sheetData = allSheetData[sheetId][sheetName];
+                    console.log(`Sheet data for ${sheetId} - ${sheetName}:`, sheetData);
 
                     const filteredData = sheetData.map(row => {
                         const filteredRow = {};
@@ -505,15 +504,14 @@
                         return filteredRow;
                     });
 
+                    console.log(`Filtered data for ${sheetId} - ${sheetName}:`, filteredData);
                     return filteredData;
                 } else {
                     console.error(`Data not found for sheetId: ${sheetId}, sheetName: ${sheetName}`);
-                    FuiToast.error(`Data not found for sheetId: ${sheetId}, sheetName: ${sheetName}`);
                     return null;
                 }
             } catch (error) {
                 console.error('Error in getSpecificColumns:', error);
-                FuiToast.error('Error in getSpecificColumns: ' + error.message);
                 return null;
             }
         }
@@ -525,7 +523,7 @@
 
                 if (table) {
                     const tableData = getSpecificColumns(sheetId, sheetName, columns);
-
+                    console.log(`Table data for ${tableId}:`, tableData);
                     if (tableData && tableData.length > 0) {
                         table.innerHTML = ''; // Clear existing content
 
@@ -569,6 +567,7 @@
                         if (detailConfigs && detailConfigs.length > 0) {
                             $(`#${tableId} tbody`).on('click', 'button.detail-btn', function () {
                                 const rowData = dataTable.row($(this).closest('tr')).data();
+                                console.log("Row data for detail view:", rowData);
                                 showDetails(detailConfigs, rowData);
                             });
                         }
@@ -580,15 +579,20 @@
         }
 
         function showDetails(detailConfigs, parentRowData) {
+            console.log("showDetails called with:", { detailConfigs, parentRowData });
             const detailContent = document.getElementById('detailContent');
             detailContent.innerHTML = '';
 
             detailConfigs.forEach((detailConfig, index) => {
+                console.log("Processing detailConfig:", detailConfig);
                 const allDetailData = getSpecificColumns(detailConfig.sheetId, detailConfig.sheetName, detailConfig.columns);
+                console.log("All detail data:", allDetailData);
                 const detailData = allDetailData.filter(row => {
                     return detailConfig.linkColumns.every(link => {
                         const parentValue = parentRowData[link.parent];
                         const childValue = row[link.child];
+
+                        console.log(`Comparing: ${parentValue} (${typeof parentValue}) with ${childValue} (${typeof childValue})`);
                         return parentValue != null && childValue != null && parentValue.toString() === childValue.toString();
                     });
                 });
@@ -596,7 +600,7 @@
                 const detailTitle = document.createElement('h3');
                 detailTitle.textContent = `${detailConfig.sheetName} Details`;
                 detailContent.appendChild(detailTitle);
-
+                console.log("Filtered detail data:", detailData);
                 const detailTable = document.createElement('table');
                 detailTable.className = 'table table-striped table-bordered';
                 detailTable.style.width = '100%';
